@@ -1,18 +1,32 @@
-// @ts-ignore
-import { instantiateStreaming, ASUtil } from "assemblyscript/lib/loader";
+import {Worker, spawn, ModuleThread} from "threads/dist";
+import {IndexWorker} from "./worker";
 
-interface MyApi {
-    add(a: number, b: number): number;
-}
 
-const imports: any = {};
+const queue = [];
 
 async function main() {
-    let interop: ASUtil & MyApi =
-        await instantiateStreaming<MyApi>(fetch("../build/optimized.wasm"), imports);
 
-    // Finally, call the add function we exported
-    console.log("The result is:", interop.add(1, 2));
+    let pool: { free: boolean, thread: ModuleThread<IndexWorker>}[] = [];
+
+
+    for( let i = 0; i < navigator.hardwareConcurrency; i++) {
+
+        const thread = await spawn<IndexWorker>(new Worker("./worker"));
+        await thread.init();
+
+        pool.push({
+            free: true,
+            thread
+        });
+    }
+
+    for (let i = 0; i < 8; ++i) {
+        pool[i].thread.getIndex().then((result) => {
+            console.log(result);
+        });
+    }
 }
 
-main();
+main().then(() => {
+
+});
