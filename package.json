@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode production",
-    "build-w": "webpack --mode development -w"
+    "build-w": "webpack --mode development -w",
+    "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --sourceMap --validate --debug",
+    "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --sourceMap --validate --optimize",
+    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized",
+    "server": "ws"
   },
   "repository": {
     "type": "git",
@@ -18,7 +22,9 @@
   },
   "homepage": "https://github.com/FoxelFox/voxel-octree#readme",
   "devDependencies": {
+    "assemblyscript": "github:assemblyscript/assemblyscript",
     "html-webpack-plugin": "^3.2.0",
+    "local-web-server": "^3.0.7",
     "ts-loader": "^6.0.4",
     "typescript": "^3.5.3",
     "webpack": "^4.39.2",
