@@ -1,31 +1,22 @@
-import {Worker, spawn, ModuleThread} from "threads/dist";
-import {IndexWorker} from "./worker";
+import {OctreeGrid} from "./octree/grid";
 
-
-const queue = [];
 
 async function main() {
+    const grid = new OctreeGrid();
 
-    let pool: { free: boolean, thread: ModuleThread<IndexWorker>}[] = [];
-
-
-    for( let i = 0; i < navigator.hardwareConcurrency; i++) {
-
-        const thread = await spawn<IndexWorker>(new Worker("./worker"));
-        await thread.init();
-
-        pool.push({
-            free: true,
-            thread
-        });
-    }
-
-    for (let i = 0; i < 8; ++i) {
-        pool[i].thread.getIndex().then((result) => {
-            console.log(result);
-        });
+    for (let i = 0; i < 1024; i++) {
+        grid.add();
     }
 }
+
+
+const h4 = document.createElement("h4");
+const p = document.createElement("p");
+h4.innerText = "WebAssembly with Threads Benchmark";
+p.id = "points";
+
+document.body.appendChild(h4);
+document.body.appendChild(p);
 
 main().then(() => {
 

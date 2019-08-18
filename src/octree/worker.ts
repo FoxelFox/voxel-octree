@@ -13,14 +13,14 @@ const worker = {
 
 
     async init() {
-      interop = await instantiateStreaming<MyApi>(fetch("../build/optimized.wasm"), imports);
+      interop = await instantiateStreaming<MyApi>(fetch("./optimized.wasm"), imports);
     },
 
     getIndex() {
 
         const results = new Uint32Array(2048);
 
-        for (let i = 0; i < 204800000; i++) {
+        for (let i = 0; i < 2048000; i++) {
             results[i] = interop.add(i, interop.add(i, 2));
         }
 

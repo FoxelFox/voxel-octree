@@ -17,7 +17,7 @@ module.exports = {
         }]
     },
     plugins: [
-        new HtmlWebpackPlugin(),
+        new HtmlWebpackPlugin({}),
         new ThreadsPlugin({path: "/"})
     ]
 };
