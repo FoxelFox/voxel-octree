@@ -3,6 +3,7 @@ import {ASUtil, instantiateStreaming} from "assemblyscript/lib/loader";
 
 interface MyApi {
     add(a: number, b: number): number;
+    work(): void;
 }
 
 let interop: ASUtil & MyApi;
@@ -17,14 +18,7 @@ const worker = {
     },
 
     getIndex() {
-
-        const results = new Uint32Array(2048);
-
-        for (let i = 0; i < 2048000; i++) {
-            results[i] = interop.add(i, interop.add(i, 2));
-        }
-
-        return results;
+        interop.work();
     }
 };
 
