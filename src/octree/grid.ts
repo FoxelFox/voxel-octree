@@ -10,13 +10,14 @@ export class OctreeGrid {
     queue = [];
     finishedWork = 0;
     start: number;
-    max: number = 0;
+    median: number = 0;
     activeThreads = 0;
     outOfWorkListener;
     scores = new Array(navigator.hardwareConcurrency);
     myChart;
 
     constructor () {
+        document.getElementById("threads").innerText = "Benchmark is running ...";
         this.createChart();
     }
 
@@ -50,33 +51,32 @@ export class OctreeGrid {
 
             worker.getIndex().then(() => {
                 const score = ++this.finishedWork / (Date.now() - this.start) * 1000;
-                if (score > this.max) {
-                    this.max = score;
-                    this.scores[this.activeThreads - 1] = this.max;
 
-                    // find best score
-                    let max = 0;
-                    let thread = 0;
-                    let i = 0;
-                    for (let t of this.scores) {
-                        ++i;
-                        if (t > max) {
-                            max = t;
-                            thread = i;
-                        }
-                    }
-                    document.getElementById("threads").innerText = max.toFixed(0) + " Points";
+                this.median = (this.median * 31 + score) / 32;
+                this.scores[this.activeThreads - 1] = this.median;
 
-                    this.updateChart();
 
-                }
+
+
                 this.pool.push(worker);
                 this.balanceWork();
             });
         }
 
         if (this.queue.length === 0 && this.pool.length === this.activeThreads) {
+            let max = 0;
+            let thread = 0;
+            let i = 0;
+            for (let t of this.scores) {
+                ++i;
+                if (t > max) {
+                    max = t;
+                    thread = i;
+                }
+            }
+            document.getElementById("threads").innerText = max.toFixed(0) + " Points";
             this.outOfWorkListener();
+            this.updateChart();
 
         }
     }
@@ -96,7 +96,7 @@ export class OctreeGrid {
         for (const score of this.scores) {
             ++i;
             labels.push(i + (i === 1 ? " Thread" : " Threads"));
-            absoluteData.push({ x: i, y: score === undefined ? 0 : score.toFixed(0)});
+            absoluteData.push({ x: i, y: score === undefined ? 0 : score});
         }
 
         this.myChart = new Chart(ctx, {
@@ -122,6 +122,11 @@ export class OctreeGrid {
                 hover: {
                     animationDuration: 0
                 },
+                elements: {
+                    line: {
+                        tension: 0
+                    }
+                }
                 // responsiveAnimationDuration: 0
             }
         });
@@ -134,7 +139,7 @@ export class OctreeGrid {
         for (const score of this.scores) {
             ++i;
             labels.push(i + (i === 1 ? " Thread" : " Threads"));
-            absoluteData.push({ x: i, y: score === undefined ? 0 : score.toFixed(0)});
+            absoluteData.push({ x: i, y: score === undefined ? 0 : score});
         }
 
         this.myChart.data.datasets = [{
