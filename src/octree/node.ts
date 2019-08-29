@@ -1,7 +1,9 @@
 export class OctreeNode {
-    data: Uint8Array;
+    children: OctreeNode[];
 
-    constructor () {
-        this[0] = 0;
+    constructor (
+        public data: number
+    ) {
+
     }
 }
