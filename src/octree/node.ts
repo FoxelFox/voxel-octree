@@ -6,4 +6,8 @@ export class OctreeNode {
     ) {
 
     }
+
+    modify(p1: number[], p2: number[], value: number) {
+
+    }
 }
