@@ -9,7 +9,6 @@ export class OctreeGrid {
 	queue = [];
 	chunks: { [key: number]: OctreeNode } = {};
 
-
 	constructor(
 		public scale: number
 	) {
@@ -39,17 +38,8 @@ export class OctreeGrid {
 
 	modify(p1: number[], p2: number[], value: number) {
 
-		const startChunkIDCoords = [
-			Math.floor(p1[0] / this.scale),
-			Math.floor(p1[1] / this.scale),
-			Math.floor(p1[2] / this.scale)
-		];
-
-		const endChunkIDCoords = [
-		    Math.floor(p2[0] / this.scale),
-			Math.floor(p2[1] / this.scale),
-			Math.floor(p2[2] / this.scale)
-		];
+		const startChunkIDCoords = this.getChunkID(p1);
+		const endChunkIDCoords = this.getChunkID(p2);
 
 		for (let x = startChunkIDCoords[0]; x <= endChunkIDCoords[0]; x++) {
 			for (let y = startChunkIDCoords[1]; y <= endChunkIDCoords[1]; y++) {
@@ -74,11 +64,24 @@ export class OctreeGrid {
                         p2[2] <= chunkAbsEndZ ? p2[2] % this.scale : this.scale - 1
                     ];
 
-					this.chunks[map3D1D(x, y, z)].modify(relStartPoint, relEndPoint, value);
+                    let chunk = this.chunks[map3D1D(x, y, z)];
+
+                    if (!chunk) {
+						this.chunks[map3D1D(x, y, z)] = chunk = new OctreeNode(value);
+					}
+
+					chunk.modify(relStartPoint, relEndPoint, value);
 				}
 			}
 		}
+	}
 
+	getChunkID(position: number[]): number[] {
+		return [
+			Math.floor(position[0] / this.scale),
+			Math.floor(position[1] / this.scale),
+			Math.floor(position[2] / this.scale)
+		];
 	}
 
 	workExample(p1: number[], p2: number[], value: number) {
