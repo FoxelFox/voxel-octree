@@ -15,9 +15,9 @@ export class ChunkNode extends SimpleNode {
 				require("./chunk-node.fs.glsl")
 			), {
 				position: new ArrayBuffer([
-					0,0,0,
-					0.5, 0.5, 0,5,
-					1,1,1,
+					1,0,0,
+					0, 1, 0,
+					0,0,1,
 				], 3, gl.FLOAT)
 			}
 		)
@@ -35,8 +35,13 @@ export class ChunkNode extends SimpleNode {
 		gl.useProgram(this.shader.program);
 		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-		gl.uniformMatrix4fv(this.shader.getUniformLocation("view"), true, this.camera.combined);
-		gl.uniform3fv(this.shader.getUniformLocation("offset"), [0, 0, 10]);
+		let model = mat4.create();
+		mat4.translate(model, model, [0, 0, 0]);
+
+		let mvp = mat4.create();
+		mat4.mul(mvp, this.camera.view, model);
+		mat4.mul(mvp, this.camera.perspective, mvp);
+		gl.uniformMatrix4fv(this.shader.getUniformLocation("mvp"), false, mvp);
 
 		gl.bindVertexArray(this.vao);
 		gl.drawArrays(gl.POINTS, 0, 3);
