@@ -1,18 +1,23 @@
-import {ModuleThread, spawn, Worker} from "threads/dist";
+import {ModuleThread, spawn, Worker, Transfer} from "threads/dist";
 import {IndexWorker} from "./worker";
 import {OctreeNode} from "./node";
 import {map3D1D} from "./util";
+import {Chunk} from "./chunk";
+
+
 
 export class OctreeGrid {
 
 	pool: ModuleThread<IndexWorker>[] = [];
-	queue = [];
-	chunks: { [key: number]: OctreeNode } = {};
+	queue: Chunk[] = [];
+	chunks: { [key: number]: Chunk } = {};
 
 	constructor(
 		public scale: number
 	) {
-		this.chunks[map3D1D(0, 0, 0)] = new OctreeNode(0);
+		this.chunks[map3D1D(0, 0, 0)] = {
+			tree: new OctreeNode(0)
+		};
 	}
 
 	async initThreads() {
@@ -24,12 +29,12 @@ export class OctreeGrid {
 
 	balanceWork() {
 		while (this.queue[0] && this.pool[0]) {
-			const work = this.queue.shift();
+			const chunk = this.queue.shift();
 			const worker = this.pool.shift();
 
-			worker.work().then(() => {
-
-
+			worker.work(chunk).then((mesh) => {
+				chunk.mesh = mesh;
+				chunk.meshUpdated = true;
 				this.pool.push(worker);
 				this.balanceWork();
 			});
@@ -67,10 +72,14 @@ export class OctreeGrid {
                     let chunk = this.chunks[map3D1D(x, y, z)];
 
                     if (!chunk) {
-						this.chunks[map3D1D(x, y, z)] = chunk = new OctreeNode(value);
+						let tree = new OctreeNode(value);
+						chunk = this.chunks[map3D1D(x, y, z)] = {
+							tree
+						}
 					}
 
-					chunk.modify(relStartPoint, relEndPoint, value);
+					chunk.tree.modify(relStartPoint, relEndPoint, value);
+					this.updateMesh(chunk);
 				}
 			}
 		}
@@ -84,8 +93,8 @@ export class OctreeGrid {
 		];
 	}
 
-	workExample(p1: number[], p2: number[], value: number) {
-		this.queue.push({p1, p2, value});
+	updateMesh(chunk: Chunk) {
+		this.queue.push(chunk);
 		this.balanceWork();
 	}
 

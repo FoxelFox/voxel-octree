@@ -23,9 +23,9 @@ function resize() {
 	}
 }
 
-export function start() {
+export function start(grid) {
 
-	const pipeline = new Pipeline();
+	const pipeline = new Pipeline(grid);
 	requestAnimationFrame(loop);
 
 	function loop() {

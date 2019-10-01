@@ -2,11 +2,13 @@ import {Shader, SimpleNode, ArrayBuffer, FrameBuffer, Texture} from "@foxel_fox/
 import {gl} from "../../context";
 import {mat4} from "gl-matrix";
 import {Camera} from "../../camera";
+import {OctreeGrid} from "../../../octree/grid";
 
 export class ChunkNode extends SimpleNode {
 
 	constructor (
-		private camera: Camera
+		private camera: Camera,
+		private grid: OctreeGrid
 	) {
 
 		super(

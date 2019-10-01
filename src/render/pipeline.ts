@@ -1,6 +1,7 @@
 import {ChunkNode} from "./node/chunk-node/chunk-node";
 import {OutputNode} from "./node/output/output";
 import {Camera} from "./camera";
+import {OctreeGrid} from "../octree/grid";
 
 export class Pipeline {
 
@@ -9,10 +10,10 @@ export class Pipeline {
 
 	camera: Camera;
 
-	constructor() {
+	constructor(grid: OctreeGrid) {
 		this.camera = new Camera();
 
-		this.chunkNode = new ChunkNode(this.camera);
+		this.chunkNode = new ChunkNode(this.camera, grid);
 		this.chunkNode.init();
 
 		this.output = new OutputNode(this.chunkNode.frameBuffer.textures[0]);
