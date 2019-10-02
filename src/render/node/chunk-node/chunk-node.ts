@@ -1,28 +1,32 @@
-import {Shader, SimpleNode, ArrayBuffer, FrameBuffer, Texture} from "@foxel_fox/glib";
+import {Shader, SimpleNode, ArrayBufferNative, FrameBuffer, Texture, ArrayBuffer} from "@foxel_fox/glib";
 import {gl} from "../../context";
 import {mat4} from "gl-matrix";
 import {Camera} from "../../camera";
 import {OctreeGrid} from "../../../octree/grid";
+import {map3D1D} from "../../../octree/util";
+import {Chunk} from "../../../octree/chunk";
 
-export class ChunkNode extends SimpleNode {
+
+interface Model {
+	vao: WebGLVertexArrayObject;
+	position: ArrayBufferNative;
+	matrix: mat4;
+}
+
+export class ChunkNode {
+
+	shader: Shader;
+	frameBuffer!: FrameBuffer;
+	models: { [key: number]: Model } = {};
 
 	constructor (
 		private camera: Camera,
 		private grid: OctreeGrid
 	) {
-
-		super(
-			new Shader(
-				require("./chunk-node.vs.glsl"),
-				require("./chunk-node.fs.glsl")
-			), {
-				position: new ArrayBuffer([
-					1,0,0,
-					0, 1, 0,
-					0,0,1,
-				], 3, gl.FLOAT)
-			}
-		)
+		this.shader = new Shader(
+			require("./chunk-node.vs.glsl"),
+			require("./chunk-node.fs.glsl")
+		);
 	}
 
 	init(): void {
@@ -31,22 +35,61 @@ export class ChunkNode extends SimpleNode {
 	}
 
 	run() {
+		this.updateMeshes();
+		this.render();
+	}
+
+	updateMeshes() {
+		for (const key in this.grid.chunks) {
+			const chunk = this.grid.chunks[key];
+			if (chunk.meshUpdated) {
+				if (!this.models[key]) {
+					this.models[key] = this.createMeshGPU(chunk);
+				} else {
+					this.models[key].position.updateBuffer(chunk.mesh);
+				}
+			}
+		}
+	}
+
+	createMeshGPU(chunk: Chunk): Model {
+		const vao = gl.createVertexArray() as WebGLVertexArrayObject;
+		const position = new ArrayBufferNative(this.grid.chunks[map3D1D([0, 0, 0])].mesh, 3, gl.FLOAT);
+		const positionAttribute = this.shader.getAttributeLocation("position");
+		const matrix = mat4.create();
+
+		gl.bindVertexArray(vao);
+		gl.bindBuffer(gl.ARRAY_BUFFER, position.buffer);
+		gl.enableVertexAttribArray(positionAttribute);
+		gl.vertexAttribPointer(positionAttribute, position.size, position.type, position.normalize, position.stride, position.offset);
+		gl.bindVertexArray(null);
+
+		mat4.fromTranslation(matrix, chunk.id);
+
+		return { vao, position, matrix };
+	}
+
+	render() {
 		this.frameBuffer.bind();
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 		gl.useProgram(this.shader.program);
 		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-		let model = mat4.create();
-		mat4.translate(model, model, [0, 0, 0]);
-
 		let mvp = mat4.create();
-		mat4.mul(mvp, this.camera.view, model);
-		mat4.mul(mvp, this.camera.perspective, mvp);
-		gl.uniformMatrix4fv(this.shader.getUniformLocation("mvp"), false, mvp);
+		let model: Model;
+		for (const key in this.models) {
+			model = this.models[key];
 
-		gl.bindVertexArray(this.vao);
-		gl.drawArrays(gl.POINTS, 0, 3);
+			mat4.identity(mvp);
+			mat4.mul(mvp, this.camera.view, model.matrix);
+			mat4.mul(mvp, this.camera.perspective, mvp);
+			gl.uniformMatrix4fv(this.shader.getUniformLocation("mvp"), false, mvp);
+
+			gl.bindVertexArray(model.vao);
+			gl.drawArrays(gl.POINTS, 0, 3);
+		}
+
+
 	}
-
 }

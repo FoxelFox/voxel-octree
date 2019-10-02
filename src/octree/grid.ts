@@ -12,11 +12,13 @@ export class OctreeGrid {
 	queue: Chunk[] = [];
 	chunks: { [key: number]: Chunk } = {};
 
-	constructor(
+	constructor (
 		public scale: number
 	) {
-		this.chunks[map3D1D(0, 0, 0)] = {
-			tree: new OctreeNode(0)
+		const id = [0, 0, 0];
+		this.chunks[map3D1D(id)] = {
+			id,
+			tree: new OctreeNode(0),
 		};
 	}
 
@@ -69,11 +71,13 @@ export class OctreeGrid {
                         p2[2] <= chunkAbsEndZ ? p2[2] % this.scale : this.scale - 1
                     ];
 
-                    let chunk = this.chunks[map3D1D(x, y, z)];
+                    const id = [x, y, z];
+                    let chunk = this.chunks[map3D1D(id)];
 
                     if (!chunk) {
 						let tree = new OctreeNode(value);
-						chunk = this.chunks[map3D1D(x, y, z)] = {
+						chunk = this.chunks[map3D1D(id)] = {
+							id,
 							tree
 						}
 					}
@@ -91,6 +95,10 @@ export class OctreeGrid {
 			Math.floor(position[1] / this.scale),
 			Math.floor(position[2] / this.scale)
 		];
+	}
+
+	getChuckByID(chunkID: number[]): Chunk {
+		return this.chunks[map3D1D(chunkID)];
 	}
 
 	updateMesh(chunk: Chunk) {
