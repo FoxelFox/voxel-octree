@@ -4,5 +4,5 @@ export interface Chunk {
 	id: number[];
 	tree: OctreeNode
 	mesh?
-	meshUpdated?
+	meshUpdated?: boolean
 }

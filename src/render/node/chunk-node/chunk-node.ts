@@ -48,13 +48,14 @@ export class ChunkNode {
 				} else {
 					this.models[key].position.updateBuffer(chunk.mesh);
 				}
+				chunk.meshUpdated = false;
 			}
 		}
 	}
 
 	createMeshGPU(chunk: Chunk): Model {
 		const vao = gl.createVertexArray() as WebGLVertexArrayObject;
-		const position = new ArrayBufferNative(this.grid.chunks[map3D1D([0, 0, 0])].mesh, 3, gl.FLOAT);
+		const position = new ArrayBufferNative(chunk.mesh, 3, gl.FLOAT);
 		const positionAttribute = this.shader.getAttributeLocation("position");
 		const matrix = mat4.create();
 
@@ -71,6 +72,7 @@ export class ChunkNode {
 
 	render() {
 		this.frameBuffer.bind();
+		gl.enable(gl.DEPTH_TEST);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 		gl.useProgram(this.shader.program);
@@ -78,6 +80,9 @@ export class ChunkNode {
 
 		let mvp = mat4.create();
 		let model: Model;
+
+
+
 		for (const key in this.models) {
 			model = this.models[key];
 
@@ -87,7 +92,7 @@ export class ChunkNode {
 			gl.uniformMatrix4fv(this.shader.getUniformLocation("mvp"), false, mvp);
 
 			gl.bindVertexArray(model.vao);
-			gl.drawArrays(gl.POINTS, 0, 3);
+			gl.drawArrays(gl.POINTS, 0, 16384);
 		}
 
 
