@@ -4,7 +4,7 @@ import {mat4} from "gl-matrix";
 import {Camera} from "../../camera";
 import {OctreeGrid} from "../../../octree/grid";
 import {map3D1D} from "../../../octree/util";
-import {Chunk} from "../../../octree/chunk";
+import {Chunk, Mesh} from "../../../octree/chunk";
 
 
 interface Model {
@@ -40,8 +40,8 @@ export class ChunkNode {
 	}
 
 	updateMeshes() {
-		for (const key in this.grid.chunks) {
-			const chunk = this.grid.chunks[key];
+		for (const key in this.grid.meshes) {
+			const chunk = this.grid.meshes[key];
 			if (chunk.meshUpdated) {
 				if (!this.models[key]) {
 					this.models[key] = this.createMeshGPU(chunk);
@@ -53,7 +53,7 @@ export class ChunkNode {
 		}
 	}
 
-	createMeshGPU(chunk: Chunk): Model {
+	createMeshGPU(chunk: Mesh): Model {
 		const vao = gl.createVertexArray() as WebGLVertexArrayObject;
 		const position = new ArrayBufferNative(chunk.mesh, 3, gl.FLOAT);
 		const positionAttribute = this.shader.getAttributeLocation("position");

@@ -17,6 +17,7 @@ export class Camera {
 	backward: boolean = false;
 	left: boolean = false;
 	right: boolean = false;
+	lastUpdateTime: number = Date.now();
 
 	constructor () {
 		mat4.translate(this.matPosition, this.matPosition, [0, 10, 0]);
@@ -35,8 +36,8 @@ export class Camera {
 				return
 			}
 
-			this.rotY += event.movementX * 0.01;
-			this.rotX += event.movementY * 0.01;
+			this.rotY += event.movementX * 0.0025;
+			this.rotX += event.movementY * 0.00251;
 
 
 			mat4.identity(this.matX);
@@ -86,6 +87,10 @@ export class Camera {
 
 
 	update() {
+		const now = Date.now();
+		const speed = (now - this.lastUpdateTime) * 0.01;
+		this.lastUpdateTime = now;
+
 		const ar = canvas.width / canvas.height;
 		mat4.perspective(this.perspective, 1.5, ar, 0.01, 128);
 
@@ -94,25 +99,25 @@ export class Camera {
 
 
 		if (this.forward) {
-			let forward = vec3.fromValues(0 , 0, 0.1);
+			let forward = vec3.fromValues(0 , 0, 0.1 * speed);
 			vec3.transformMat4(forward, forward, inverseRotation);
 			mat4.translate(this.matPosition, this.matPosition, forward)
 		}
 
 		if (this.backward) {
-			let backward = vec3.fromValues(0 , 0, -0.1);
+			let backward = vec3.fromValues(0 , 0, -0.1 * speed);
 			vec3.transformMat4(backward, backward, inverseRotation);
 			mat4.translate(this.matPosition, this.matPosition, backward)
 		}
 
 		if (this.left) {
-			let left = vec3.fromValues(0.1 , 0, 0);
+			let left = vec3.fromValues(0.1 * speed, 0, 0);
 			vec3.transformMat4(left, left, inverseRotation);
 			mat4.translate(this.matPosition, this.matPosition, left)
 		}
 
 		if (this.right) {
-			let right = vec3.fromValues(-0.1 , 0, 0);
+			let right = vec3.fromValues(-0.1 * speed, 0, 0);
 			vec3.transformMat4(right, right, inverseRotation);
 			mat4.translate(this.matPosition, this.matPosition, right)
 		}

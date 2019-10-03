@@ -1,8 +1,8 @@
 import {ModuleThread, spawn, Worker, Transfer} from "threads/dist";
 import {IndexWorker} from "./worker";
-import {OctreeNode} from "./node";
+import {modify, OctreeNode} from "./node";
 import {map3D1D} from "./util";
-import {Chunk} from "./chunk";
+import {Chunk, Mesh} from "./chunk";
 
 
 
@@ -11,6 +11,7 @@ export class OctreeGrid {
 	pool: ModuleThread<IndexWorker>[] = [];
 	queue: Chunk[] = [];
 	chunks: { [key: number]: Chunk } = {};
+	meshes: { [key: number]: Mesh } = {};
 
 	constructor (
 		public scale: number
@@ -18,12 +19,13 @@ export class OctreeGrid {
 		const id = [0, 0, 0];
 		this.chunks[map3D1D(id)] = {
 			id,
-			tree: new OctreeNode(0),
+			tree: { data: 0},
 		};
 	}
 
 	async initThreads() {
-		for (let i = 0; i < navigator.hardwareConcurrency; i++) {
+		const maxWorkerThreads = Math.max(1, navigator.hardwareConcurrency -1);
+		for (let i = 0; i < maxWorkerThreads; i++) {
 			const thread = await spawn<IndexWorker>(new Worker("./worker"));
 			this.pool.push(thread);
 		}
@@ -34,10 +36,12 @@ export class OctreeGrid {
 			const chunk = this.queue.shift();
 			const worker = this.pool.shift();
 
-			worker.work(chunk).then((mesh) => {
-				chunk.mesh = mesh;
-				chunk.meshUpdated = true;
+			worker.work(chunk.id, this.chunks).then((mesh) => {
+				const chunkMesh = this.meshes[map3D1D(chunk.id)];
+				chunkMesh.mesh = mesh;
+				chunkMesh.meshUpdated = true;
 				this.pool.push(worker);
+				this.queue.push(chunk); // REMOVE
 				this.balanceWork();
 			});
 		}
@@ -75,14 +79,27 @@ export class OctreeGrid {
                     let chunk = this.chunks[map3D1D(id)];
 
                     if (!chunk) {
-						let tree = new OctreeNode(value);
+						let tree = { data: 0 };
 						chunk = this.chunks[map3D1D(id)] = {
 							id,
 							tree
+						};
+
+						this.meshes[map3D1D(id)] = {
+							id,
+							meshUpdated: false
 						}
 					}
 
-					chunk.tree.modify(relStartPoint, relEndPoint, value);
+                    const info = {
+						size: this.scale,
+						node: chunk.tree,
+						position: [0, 0, 0],
+						depth: 0
+					};
+
+                    modify(info, relStartPoint, relEndPoint, value);
+
 					this.updateMesh(chunk);
 				}
 			}
