@@ -16,11 +16,11 @@ export class OctreeGrid {
 	constructor (
 		public scale: number
 	) {
-		const id = [0, 0, 0];
-		this.chunks[map3D1D(id)] = {
-			id,
-			tree: { data: 0},
-		};
+		// const id = [0, 0, 0];
+		// this.chunks[map3D1D(id)] = {
+		// 	id,
+		// 	tree: { data: 0},
+		// };
 	}
 
 	async initThreads() {
@@ -35,13 +35,12 @@ export class OctreeGrid {
 		while (this.queue[0] && this.pool[0]) {
 			const chunk = this.queue.shift();
 			const worker = this.pool.shift();
+			const chunkMesh = this.meshes[map3D1D(chunk.id)];
 
-			worker.work(chunk.id, this.chunks).then((mesh) => {
-				const chunkMesh = this.meshes[map3D1D(chunk.id)];
+			worker.work(chunk.id, this.chunks, Transfer(chunkMesh.mesh)).then((mesh) => {
 				chunkMesh.mesh = mesh;
 				chunkMesh.meshUpdated = true;
 				this.pool.push(worker);
-				this.queue.push(chunk); // REMOVE
 				this.balanceWork();
 			});
 		}
@@ -87,7 +86,8 @@ export class OctreeGrid {
 
 						this.meshes[map3D1D(id)] = {
 							id,
-							meshUpdated: false
+							meshUpdated: false,
+							mesh: new ArrayBuffer(16384 * 3 * 4)
 						}
 					}
 

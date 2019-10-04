@@ -49,6 +49,10 @@ export class ChunkNode {
 					this.models[key].position.updateBuffer(chunk.mesh);
 				}
 				chunk.meshUpdated = false;
+
+				// FIXME: REMOVE
+				this.grid.updateMesh(this.grid.chunks[map3D1D(chunk.id)]);
+				// break; // only update one mesh per Frame
 			}
 		}
 	}

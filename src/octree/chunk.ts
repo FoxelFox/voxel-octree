@@ -1,12 +1,12 @@
 import {OctreeNode} from "./node";
 
 export interface Chunk {
-	id: number[];
+	id: number[]
 	tree: OctreeNode
 }
 
 export interface Mesh {
-	id: number[];
-	mesh?
+	id: number[]
+	mesh?: ArrayBuffer
 	meshUpdated?: boolean
 }
