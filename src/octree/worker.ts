@@ -1,8 +1,61 @@
 import {expose, Transfer, TransferDescriptor} from "threads/dist";
 import {Chunk} from "./chunk";
-import {OctreeNode} from "./node";
-import {map3D1D} from "./util";
+import {childIndex, OctreeNode, TraversalInfo} from "./node";
+import {childDirections, map3D1D} from "./util";
+import {checkServerIdentity} from "tls";
 
+
+function createMesh(out: Float32Array, info: TraversalInfo, vertexIndex: number): number {
+	if (info.node.children) {
+		for (const childID in info.node.children) {
+			const childDirection = childDirections[childID];
+			const childSize = info.size / 2;
+			const childInfo: TraversalInfo = {
+				node: info.node.children[childID],
+				size: childSize,
+				depth: info.depth + 1,
+				position: [
+					info.position[0] + childDirection[0] * childSize,
+					info.position[1] + childDirection[1] * childSize,
+					info.position[2] + childDirection[2] * childSize
+				]
+			};
+			vertexIndex = createMesh(out, childInfo, vertexIndex);
+		}
+		return vertexIndex;
+
+	} else {
+
+		const offset = info.size;
+		// top
+		out[vertexIndex++] = info.position[0] - offset;
+		out[vertexIndex++] = info.position[1] - offset;
+		out[vertexIndex++] = info.position[2] + offset;
+
+		out[vertexIndex++] = info.position[0] + offset;
+		out[vertexIndex++] = info.position[1] - offset;
+		out[vertexIndex++] = info.position[2] + offset;
+
+		out[vertexIndex++] = info.position[0] + offset;
+		out[vertexIndex++] = info.position[1] + offset;
+		out[vertexIndex++] = info.position[2] + offset;
+
+		// top
+		out[vertexIndex++] = info.position[0] - offset;
+		out[vertexIndex++] = info.position[1] - offset;
+		out[vertexIndex++] = info.position[2] + offset;
+
+		out[vertexIndex++] = info.position[0] + offset;
+		out[vertexIndex++] = info.position[1] + offset;
+		out[vertexIndex++] = info.position[2] + offset;
+
+		out[vertexIndex++] = info.position[0] - offset;
+		out[vertexIndex++] = info.position[1] + offset;
+		out[vertexIndex++] = info.position[2] + offset;
+
+		return vertexIndex;
+	}
+}
 
 
 const worker = {
@@ -12,12 +65,19 @@ const worker = {
     	const master = chunks[map3D1D(id)];
     	const size = 16384 * 3;
     	const f32 = new Float32Array(mesh);
+    	const info: TraversalInfo = {
+    		depth: 0,
+			position: [0, 0, 0],
+			size: 0.5,
+			node: master.tree
+		};
 
-        for (let i = 0; i < size; i++) {
-			f32[i] = Math.random();
-        }
+    	const f32Count = createMesh(f32, info, 0);
 
-        return Transfer(f32.buffer);
+        return {
+        	vertexCount: f32Count / 3,
+        	buffer: Transfer(f32.buffer)
+        };
     }
 };
 

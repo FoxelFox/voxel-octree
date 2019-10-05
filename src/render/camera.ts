@@ -20,7 +20,7 @@ export class Camera {
 	lastUpdateTime: number = Date.now();
 
 	constructor () {
-		mat4.translate(this.matPosition, this.matPosition, [0, 10, 0]);
+		mat4.translate(this.matPosition, this.matPosition, [0, 1, 0]);
 		mat4.rotateX(this.matX, this.matX, this.rotX);
 		mat4.mul(this.matRotation, this.matX, this.matY);
 
@@ -88,11 +88,11 @@ export class Camera {
 
 	update() {
 		const now = Date.now();
-		const speed = (now - this.lastUpdateTime) * 0.01;
+		const speed = (now - this.lastUpdateTime) * 0.001;
 		this.lastUpdateTime = now;
 
 		const ar = canvas.width / canvas.height;
-		mat4.perspective(this.perspective, 1.5, ar, 0.01, 128);
+		mat4.perspective(this.perspective, 1.5, ar, 0.0001, 128);
 
 		let inverseRotation = mat4.create();
 		mat4.invert(inverseRotation,this.matRotation);

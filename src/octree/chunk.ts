@@ -9,4 +9,5 @@ export interface Mesh {
 	id: number[]
 	mesh?: ArrayBuffer
 	meshUpdated?: boolean
+	vertexCount?: number
 }

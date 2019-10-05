@@ -6,9 +6,11 @@ export interface OctreeNode {
 export interface TraversalInfo {
     size: number,
     depth: number,
-    position: number[]
+    position?: number[]
     node: OctreeNode
 }
+
+
 
 export function modify(info: TraversalInfo, p1: number[], p2: number[], value: number) {
     // check merge
@@ -35,7 +37,22 @@ export function modify(info: TraversalInfo, p1: number[], p2: number[], value: n
         }
 
         // cut update down
+        const childSize = info.size / 2;
 
-
+        if (p1[0] < childSize && p1[1] < childSize && p1[2] < childSize) {
+            // info.node.children[0]
+            const childInfo: TraversalInfo = {
+                node: info.node.children[0],
+                size: childSize,
+                // position: [-0.5, -0.5, -0.5], // TODO
+                depth: info.depth + 1
+            };
+            modify(childInfo, p1, p2, value);
+        }
     }
 }
+
+export function childIndex(p: number[]): number {
+    return p[0] + 2 * (p[1] + 2 * p[2]);
+}
+

@@ -38,7 +38,8 @@ export class OctreeGrid {
 			const chunkMesh = this.meshes[map3D1D(chunk.id)];
 
 			worker.work(chunk.id, this.chunks, Transfer(chunkMesh.mesh)).then((mesh) => {
-				chunkMesh.mesh = mesh;
+				chunkMesh.mesh = mesh.buffer.send;
+				chunkMesh.vertexCount = mesh.vertexCount;
 				chunkMesh.meshUpdated = true;
 				this.pool.push(worker);
 				this.balanceWork();

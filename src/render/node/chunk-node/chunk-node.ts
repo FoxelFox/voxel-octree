@@ -8,9 +8,10 @@ import {Chunk, Mesh} from "../../../octree/chunk";
 
 
 interface Model {
-	vao: WebGLVertexArrayObject;
-	position: ArrayBufferNative;
-	matrix: mat4;
+	vao: WebGLVertexArrayObject
+	position: ArrayBufferNative
+	matrix: mat4
+	vertexCount: number
 }
 
 export class ChunkNode {
@@ -50,8 +51,7 @@ export class ChunkNode {
 				}
 				chunk.meshUpdated = false;
 
-				// FIXME: REMOVE
-				this.grid.updateMesh(this.grid.chunks[map3D1D(chunk.id)]);
+
 				// break; // only update one mesh per Frame
 			}
 		}
@@ -71,7 +71,7 @@ export class ChunkNode {
 
 		mat4.fromTranslation(matrix, chunk.id);
 
-		return { vao, position, matrix };
+		return { vao, position, matrix, vertexCount: chunk.vertexCount };
 	}
 
 	render() {
@@ -96,7 +96,7 @@ export class ChunkNode {
 			gl.uniformMatrix4fv(this.shader.getUniformLocation("mvp"), false, mvp);
 
 			gl.bindVertexArray(model.vao);
-			gl.drawArrays(gl.POINTS, 0, 16384);
+			gl.drawArrays(gl.TRIANGLES, 0, model.vertexCount);
 		}
 
 

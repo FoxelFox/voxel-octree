@@ -10,6 +10,9 @@ export const gl = canvas.getContext("webgl2", {
 }) as WebGL2RenderingContext;
 setContext(gl);
 
+gl.enable(gl.CULL_FACE);
+//gl.cullFace(gl.FRONT_FACE);
+
 canvas.style.width = "100vw";
 canvas.style.height = "100vh";
 canvas.style.display = "block";

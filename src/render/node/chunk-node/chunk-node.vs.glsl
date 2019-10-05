@@ -13,4 +13,5 @@ void main() {
     gl_Position = mvp * vec4(position, 1.0);
 
     v_color.rgb = position;
+    v_color.w = length(gl_Position.xyz);
 }
