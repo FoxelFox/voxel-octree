@@ -3,9 +3,16 @@
 precision highp float;
 
 in vec4 v_color;
+in vec3 wire;
 layout(location = 0) out vec4 f_color;
 
+
+float edgeFactor(){
+    vec3 d = fwidth(wire);
+    vec3 a3 = smoothstep(vec3(0.0), d*1.5, wire);
+    return min(min(a3.x, a3.y), a3.z);
+}
+
 void main() {
-    //f_color = vec4((v_color.rgb + 1.0) * 0.5, 1.0);
-    f_color = vec4( 1.0);
+    f_color.rgb = mix(vec3(0.75), vec3(1.0), edgeFactor());
 }

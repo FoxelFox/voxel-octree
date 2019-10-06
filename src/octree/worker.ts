@@ -27,6 +27,7 @@ function createMesh(out: Float32Array, info: TraversalInfo, vertexIndex: number)
 
 	} else {
 
+
 		if (info.node.data === 0) {
 			return vertexIndex;
 		}
@@ -78,10 +79,12 @@ function createMesh(out: Float32Array, info: TraversalInfo, vertexIndex: number)
 
 const worker = {
 
-    work(id: number[], chunks: { [key: number]: Chunk } = {}, mesh) {
+    work(id: number[], chunks: string, mesh?) {
 
-    	const master = chunks[map3D1D(id)];
-    	const f32 = new Float32Array(mesh);
+
+    	const parsed = JSON.parse(chunks);
+    	const master = parsed[map3D1D(id)];
+    	const f32 = mesh ? new Float32Array(mesh) : new Float32Array(16777216 * 3);
     	const info: TraversalInfo = {
     		depth: 0,
 			position: [0, 0, 0],

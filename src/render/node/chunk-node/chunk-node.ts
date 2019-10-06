@@ -51,7 +51,7 @@ export class ChunkNode {
 				}
 				chunk.meshUpdated = false;
 
-
+				//this.grid.updateMesh(this.grid.chunks[map3D1D(chunk.id)]) // REMOVE
 				// break; // only update one mesh per Frame
 			}
 		}
@@ -59,7 +59,7 @@ export class ChunkNode {
 
 	createMeshGPU(chunk: Mesh): Model {
 		const vao = gl.createVertexArray() as WebGLVertexArrayObject;
-		const position = new ArrayBufferNative(chunk.mesh, 3, gl.FLOAT);
+		const position = new ArrayBufferNative(chunk.mesh, 4 * chunk.vertexCount, 3, gl.FLOAT);
 		const positionAttribute = this.shader.getAttributeLocation("position");
 		const matrix = mat4.create();
 
@@ -96,7 +96,7 @@ export class ChunkNode {
 			gl.uniformMatrix4fv(this.shader.getUniformLocation("mvp"), false, mvp);
 
 			gl.bindVertexArray(model.vao);
-			gl.drawArrays(gl.LINE_STRIP, 0, model.vertexCount);
+			gl.drawArrays(gl.TRIANGLES, 0, model.vertexCount);
 		}
 
 

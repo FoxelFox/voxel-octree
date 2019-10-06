@@ -6,8 +6,12 @@ import {start} from "./render/loop";
 async function main() {
     const grid = new OctreeGrid(1024);
     await grid.initThreads();
-    grid.modify([0, 0, 0], [1023, 1023, 1023], 1);
-    grid.modify([2000, 0, 0], [3000, 1023, 800], 1);
+    grid.modify([0, 0, 0], [1023, 1023, 1], 1);
+    //grid.modify([2000, 400, 200], [2128, 800, 201], 1);
+
+    let i = 0;
+
+
 
     start(grid);
 }

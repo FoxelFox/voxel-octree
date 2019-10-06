@@ -148,4 +148,10 @@ export class Camera {
 		mat4.mul(this.view, this.matRotation, this.matPosition);
 	}
 
+	get position(): Float32Array {
+		let out = vec3.create();
+		mat4.getTranslation(out, this.matPosition);
+		return out;
+	}
+
 }

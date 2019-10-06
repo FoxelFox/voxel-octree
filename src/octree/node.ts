@@ -55,54 +55,73 @@ export function modify(info: TraversalInfo, p1: number[], p2: number[], value: n
 
 
         // TODO Simplify
-        if (x0 && y0 && z0) {
-            const cIndex = childIndex([0, 0, 0]);
-            childInfo.node = info.node.children[cIndex];
-            modify(childInfo, [x0[0], y0[0], z0[0]], [x0[1], y0[1], z0[1]], value);
+
+        if (x0) {
+            if (y0) {
+                if (z0) {
+                    // const cIndex = childIndex([0, 0, 0]);
+                    const cIndex = 0;
+                    childInfo.node = info.node.children[cIndex];
+                    modify(childInfo, [x0[0], y0[0], z0[0]], [x0[1], y0[1], z0[1]], value);
+                }
+
+                if (z1) {
+                    // const cIndex = childIndex([0, 0, 1]);
+                    const cIndex = 4;
+                    childInfo.node = info.node.children[cIndex];
+                    modify(childInfo, [x0[0], y0[0], z1[0]], [x0[1], y0[1], z1[1]], value);
+                }
+            }
+
+            if (y1) {
+                if (z0) {
+                    // const cIndex = childIndex([0, 1, 0]);
+                    const cIndex = 2;
+                    childInfo.node = info.node.children[cIndex];
+                    modify(childInfo, [x0[0], y1[0], z0[0]], [x0[1], y1[1], z0[1]], value);
+                }
+
+                if (z1) {
+                    // const cIndex = childIndex([0, 1, 1]);
+                    const cIndex = 6;
+                    childInfo.node = info.node.children[cIndex];
+                    modify(childInfo, [x0[0], y1[0], z1[0]], [x0[1], y1[1], z1[1]], value);
+                }
+            }
         }
 
-        if (x1 && y0 && z0) {
-            const cIndex = childIndex([1, 0, 0]);
-            childInfo.node = info.node.children[cIndex];
-            modify(childInfo, [x1[0], y0[0], z0[0]], [x1[1], y0[1], z0[1]], value);
-        }
+        if (x1) {
+            if (y0) {
+                if (z0) {
+                    // const cIndex = childIndex([1, 0, 0]);
+                    const cIndex = 1;
+                    childInfo.node = info.node.children[cIndex];
+                    modify(childInfo, [x1[0], y0[0], z0[0]], [x1[1], y0[1], z0[1]], value);
+                }
 
-        if (x0 && y1 && z0) {
-            const cIndex = childIndex([0, 1, 0]);
-            childInfo.node = info.node.children[cIndex];
-            modify(childInfo, [x0[0], y1[0], z0[0]], [x0[1], y1[1], z0[1]], value);
-        }
+                if (z1) {
+                    // const cIndex = childIndex([1, 0, 1]);
+                    const cIndex = 5;
+                    childInfo.node = info.node.children[cIndex];
+                    modify(childInfo, [x1[0], y0[0], z1[0]], [x1[1], y0[1], z1[1]], value);
+                }
+            }
 
-        if (x0 && y0 && z1) {
-            const cIndex = childIndex([0, 0, 1]);
-            childInfo.node = info.node.children[cIndex];
-            modify(childInfo, [x0[0], y0[0], z1[0]], [x0[1], y1[1], z1[1]], value);
+            if (y1) {
+                if (z0) {
+                    // const cIndex = childIndex([1, 1, 0]);
+                    const cIndex = 3
+                    childInfo.node = info.node.children[cIndex];
+                    modify(childInfo, [x1[0], y1[0], z0[0]], [x1[1], y1[1], z0[1]], value);
+                }
+                if (z1) {
+                    // const cIndex = childIndex([1, 1, 1]);
+                    const cIndex = 7;
+                    childInfo.node = info.node.children[cIndex];
+                    modify(childInfo, [x1[0], y1[0], z1[0]], [x1[1], y1[1], z1[1]], value);
+                }
+            }
         }
-
-        if (x1 && y1 && z0) {
-            const cIndex = childIndex([1, 1, 0]);
-            childInfo.node = info.node.children[cIndex];
-            modify(childInfo, [x1[0], y1[0], z0[0]], [x1[1], y1[1], z0[1]], value);
-        }
-
-        if (x1 && y0 && z1) {
-            const cIndex = childIndex([1, 0, 1]);
-            childInfo.node = info.node.children[cIndex];
-            modify(childInfo, [x1[0], y0[0], z1[0]], [x1[1], y0[1], z1[1]], value);
-        }
-
-        if (x0 && y1 && z1) {
-            const cIndex = childIndex([0, 1, 1]);
-            childInfo.node = info.node.children[cIndex];
-            modify(childInfo, [x0[0], y1[0], z1[0]], [x0[1], y1[1], z1[1]], value);
-        }
-
-        if (x1 && y1 && z1) {
-            const cIndex = childIndex([1, 1, 1]);
-            childInfo.node = info.node.children[cIndex];
-            modify(childInfo, [x1[0], y1[0], z1[0]], [x1[1], y1[1], z1[1]], value);
-        }
-
     }
 }
 

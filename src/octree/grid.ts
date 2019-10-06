@@ -37,7 +37,7 @@ export class OctreeGrid {
 			const worker = this.pool.shift();
 			const chunkMesh = this.meshes[map3D1D(chunk.id)];
 
-			worker.work(chunk.id, this.chunks, Transfer(chunkMesh.mesh)).then((mesh) => {
+			worker.work(chunk.id, JSON.stringify(this.chunks), chunkMesh.mesh ? Transfer(chunkMesh.mesh) : undefined).then((mesh) => {
 				chunkMesh.mesh = mesh.buffer.send;
 				chunkMesh.vertexCount = mesh.vertexCount;
 				chunkMesh.meshUpdated = true;
@@ -88,7 +88,7 @@ export class OctreeGrid {
 						this.meshes[map3D1D(id)] = {
 							id,
 							meshUpdated: false,
-							mesh: new ArrayBuffer(16777216 * 3 * 4)
+							mesh: undefined
 						}
 					}
 
