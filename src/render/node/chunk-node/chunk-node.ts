@@ -96,7 +96,7 @@ export class ChunkNode {
 			gl.uniformMatrix4fv(this.shader.getUniformLocation("mvp"), false, mvp);
 
 			gl.bindVertexArray(model.vao);
-			gl.drawArrays(gl.TRIANGLES, 0, model.vertexCount);
+			gl.drawArrays(gl.LINE_STRIP, 0, model.vertexCount);
 		}
 
 

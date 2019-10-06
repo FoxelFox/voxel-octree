@@ -14,4 +14,5 @@ void main() {
 
     v_color.rgb = position;
     v_color.w = length(gl_Position.xyz);
+
 }

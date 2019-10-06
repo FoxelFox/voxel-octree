@@ -4,6 +4,7 @@ import {childIndex, OctreeNode, TraversalInfo} from "./node";
 import {childDirections, map3D1D} from "./util";
 import {checkServerIdentity} from "tls";
 
+const minOffset = 0.0009765625;
 
 function createMesh(out: Float32Array, info: TraversalInfo, vertexIndex: number): number {
 	if (info.node.children) {
@@ -26,7 +27,24 @@ function createMesh(out: Float32Array, info: TraversalInfo, vertexIndex: number)
 
 	} else {
 
+		if (info.node.data === 0) {
+			return vertexIndex;
+		}
+
 		const offset = info.size;
+
+		const relPositionStart = [
+			(info.position[0] - offset + 0.5) * 512,
+			(info.position[1] - offset + 0.5) * 512,
+			(info.position[2] - offset + 0.5) * 512
+		];
+
+		const relPositionEnd = [
+			(info.position[0] + offset + 0.5) * 512,
+			(info.position[1] + offset + 0.5) * 512,
+			(info.position[2] + offset + 0.5) * 512
+		];
+
 		// top
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] - offset;
@@ -63,7 +81,6 @@ const worker = {
     work(id: number[], chunks: { [key: number]: Chunk } = {}, mesh) {
 
     	const master = chunks[map3D1D(id)];
-    	const size = 16384 * 3;
     	const f32 = new Float32Array(mesh);
     	const info: TraversalInfo = {
     		depth: 0,

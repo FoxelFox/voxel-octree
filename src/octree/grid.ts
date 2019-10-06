@@ -57,11 +57,11 @@ export class OctreeGrid {
 				for (let z = startChunkIDCoords[2]; z <= endChunkIDCoords[2]; z++) {
 
 				    const chunkAbsStartX = x * this.scale;
-				    const chunkAbsEndX = (x + 1) * this.scale;
+				    const chunkAbsEndX = (x + 1) * this.scale -1;
                     const chunkAbsStartY = y * this.scale;
-                    const chunkAbsEndY = (y + 1) * this.scale;
+                    const chunkAbsEndY = (y + 1) * this.scale -1;
                     const chunkAbsStartZ = z * this.scale;
-                    const chunkAbsEndZ = (z + 1) * this.scale;
+                    const chunkAbsEndZ = (z + 1) * this.scale -1;
 
                     const relStartPoint = [
                         p1[0] > chunkAbsStartX ? p1[0] - chunkAbsStartX : 0,
@@ -88,7 +88,7 @@ export class OctreeGrid {
 						this.meshes[map3D1D(id)] = {
 							id,
 							meshUpdated: false,
-							mesh: new ArrayBuffer(16384 * 3 * 4)
+							mesh: new ArrayBuffer(16777216 * 3 * 4)
 						}
 					}
 

@@ -17,6 +17,7 @@ export class Camera {
 	backward: boolean = false;
 	left: boolean = false;
 	right: boolean = false;
+	speed: boolean = false;
 	lastUpdateTime: number = Date.now();
 
 	constructor () {
@@ -66,21 +67,43 @@ export class Camera {
 			mat4.mul(this.matRotation, this.matX, this.matY);
 		}, false);
 
+		// WTF clean up this shit
 		document.addEventListener('keydown', (element) => {
 			switch (element.key) {
-				case "w": this.forward = true; break;
-				case "s": this.backward = true; break;
-				case "a": this.left = true; break;
-				case "d": this.right = true; break;
+				case "w":
+				case "W":
+					this.forward = true; break;
+				case "s":
+				case "S":
+					this.backward = true; break;
+				case "a":
+				case "A":
+					this.left = true; break;
+				case "d":
+				case "D":
+					this.right = true; break;
+				case "Shift":
+					this.speed = true; break;
 			}
 		});
 
+		// WTF clean up this shit
 		document.addEventListener('keyup', (element) => {
 			switch (element.key) {
-				case "w": this.forward = false; break;
-				case "s": this.backward = false; break;
-				case "a": this.left = false; break;
-				case "d": this.right = false; break;
+				case "w":
+				case "W":
+					this.forward = false; break;
+				case "s":
+				case "S":
+					this.backward = false; break;
+				case "a":
+				case "A":
+					this.left = false; break;
+				case "d":
+				case "D":
+					this.right = false; break;
+				case "Shift":
+					this.speed = false; break;
 			}
 		});
 	}
@@ -88,7 +111,7 @@ export class Camera {
 
 	update() {
 		const now = Date.now();
-		const speed = (now - this.lastUpdateTime) * 0.001;
+		const speed = (now - this.lastUpdateTime) * 0.001 * (this.speed ? 3 : 1);
 		this.lastUpdateTime = now;
 
 		const ar = canvas.width / canvas.height;

@@ -39,17 +39,108 @@ export function modify(info: TraversalInfo, p1: number[], p2: number[], value: n
         // cut update down
         const childSize = info.size / 2;
 
-        if (p1[0] < childSize && p1[1] < childSize && p1[2] < childSize) {
-            // info.node.children[0]
-            const childInfo: TraversalInfo = {
-                node: info.node.children[0],
-                size: childSize,
-                // position: [-0.5, -0.5, -0.5], // TODO
-                depth: info.depth + 1
-            };
-            modify(childInfo, p1, p2, value);
+        const x0 = lowerRange(p1[0], p2[0], childSize);
+        const y0 = lowerRange(p1[1], p2[1], childSize);
+        const z0 = lowerRange(p1[2], p2[2], childSize);
+
+        const x1 = upperRange(p1[0], p2[0], childSize);
+        const y1 = upperRange(p1[1], p2[1], childSize);
+        const z1 = upperRange(p1[2], p2[2], childSize);
+
+        const childInfo: TraversalInfo = {
+            node: undefined,
+            size: childSize,
+            depth: info.depth + 1
+        };
+
+
+        // TODO Simplify
+        if (x0 && y0 && z0) {
+            const cIndex = childIndex([0, 0, 0]);
+            childInfo.node = info.node.children[cIndex];
+            modify(childInfo, [x0[0], y0[0], z0[0]], [x0[1], y0[1], z0[1]], value);
         }
+
+        if (x1 && y0 && z0) {
+            const cIndex = childIndex([1, 0, 0]);
+            childInfo.node = info.node.children[cIndex];
+            modify(childInfo, [x1[0], y0[0], z0[0]], [x1[1], y0[1], z0[1]], value);
+        }
+
+        if (x0 && y1 && z0) {
+            const cIndex = childIndex([0, 1, 0]);
+            childInfo.node = info.node.children[cIndex];
+            modify(childInfo, [x0[0], y1[0], z0[0]], [x0[1], y1[1], z0[1]], value);
+        }
+
+        if (x0 && y0 && z1) {
+            const cIndex = childIndex([0, 0, 1]);
+            childInfo.node = info.node.children[cIndex];
+            modify(childInfo, [x0[0], y0[0], z1[0]], [x0[1], y1[1], z1[1]], value);
+        }
+
+        if (x1 && y1 && z0) {
+            const cIndex = childIndex([1, 1, 0]);
+            childInfo.node = info.node.children[cIndex];
+            modify(childInfo, [x1[0], y1[0], z0[0]], [x1[1], y1[1], z0[1]], value);
+        }
+
+        if (x1 && y0 && z1) {
+            const cIndex = childIndex([1, 0, 1]);
+            childInfo.node = info.node.children[cIndex];
+            modify(childInfo, [x1[0], y0[0], z1[0]], [x1[1], y0[1], z1[1]], value);
+        }
+
+        if (x0 && y1 && z1) {
+            const cIndex = childIndex([0, 1, 1]);
+            childInfo.node = info.node.children[cIndex];
+            modify(childInfo, [x0[0], y1[0], z1[0]], [x0[1], y1[1], z1[1]], value);
+        }
+
+        if (x1 && y1 && z1) {
+            const cIndex = childIndex([1, 1, 1]);
+            childInfo.node = info.node.children[cIndex];
+            modify(childInfo, [x1[0], y1[0], z1[0]], [x1[1], y1[1], z1[1]], value);
+        }
+
     }
+}
+
+function lowerRange(n1, n2, mid) {
+    if (n1 < mid) {
+        return [n1, n2 >= mid ? mid -1 : n2]
+    }
+}
+
+function upperRange(n1, n2, mid) {
+    if (n2 >= mid) {
+        return [n1 >= mid ? n1 - mid : 0, n2 - mid]
+    }
+}
+
+export function getData(info: TraversalInfo, p1: number[]) {
+
+    if (!info.node.children || info.size === 1) {
+        return info.node.data;
+    } else {
+        const childID = [
+            p1[0] < info.size ? 0 : 1,
+            p1[1] < info.size ? 0 : 1,
+            p1[2] < info.size ? 0 : 1
+        ];
+
+        const childInfo: TraversalInfo = {
+            node: info.node.children[childIndex(childID)],
+            size: info.size / 2,
+            depth: info.depth + 1
+        };
+
+        return getData(childInfo, p1);
+    }
+
+
+
+
 }
 
 export function childIndex(p: number[]): number {
