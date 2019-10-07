@@ -35,15 +35,15 @@ function createMesh(out: Float32Array, info: TraversalInfo, vertexIndex: number)
 		const offset = info.size;
 
 		const relPositionStart = [
-			(info.position[0] - offset + 0.5) * 512,
-			(info.position[1] - offset + 0.5) * 512,
-			(info.position[2] - offset + 0.5) * 512
+			(info.position[0] - offset + 0.5) * 1024,
+			(info.position[1] - offset + 0.5) * 1024,
+			(info.position[2] - offset + 0.5) * 1024
 		];
 
 		const relPositionEnd = [
-			(info.position[0] + offset + 0.5) * 512,
-			(info.position[1] + offset + 0.5) * 512,
-			(info.position[2] + offset + 0.5) * 512
+			(info.position[0] + offset + 0.5) * 1024,
+			(info.position[1] + offset + 0.5) * 1024,
+			(info.position[2] + offset + 0.5) * 1024
 		];
 
 		// top

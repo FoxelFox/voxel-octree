@@ -7,10 +7,9 @@ export class Pipeline {
 
 	chunkNode: ChunkNode;
 	output: OutputNode;
-
 	camera: Camera;
 
-	constructor(grid: OctreeGrid) {
+	constructor(public grid: OctreeGrid) {
 		this.camera = new Camera();
 
 		this.chunkNode = new ChunkNode(this.camera, grid);
@@ -20,13 +19,12 @@ export class Pipeline {
 		this.output.init();
 
 		document.addEventListener("keydown", (element) => {
-
 			switch (element.key) {
 				case "e":
 				case "E":
 					const p = this.camera.position;
 					const start = [Math.floor(p[0] * -1024 + 512), Math.floor(p[1] * -1024 + 512), Math.floor(p[2] * -1024 + 512)];
-					const end = [start[0] + 1, start[1] + 1, start[2] + 1];
+					const end = [start[0], start[1], start[2]];
 					grid.modify(start, end, 1);
 					console.log(start, end);
 					break;
@@ -37,6 +35,7 @@ export class Pipeline {
 	}
 
 	run() {
+		this.grid.balanceWork();
 		this.camera.update();
 		this.chunkNode.run();
 		this.output.run();

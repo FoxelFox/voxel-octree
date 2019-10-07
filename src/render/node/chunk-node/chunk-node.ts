@@ -47,7 +47,8 @@ export class ChunkNode {
 				if (!this.models[key]) {
 					this.models[key] = this.createMeshGPU(chunk);
 				} else {
-					this.models[key].position.updateBuffer(chunk.mesh);
+					this.models[key].position.updateBuffer(chunk.mesh, 4 * chunk.vertexCount);
+					this.models[key].vertexCount = chunk.vertexCount;
 				}
 				chunk.meshUpdated = false;
 

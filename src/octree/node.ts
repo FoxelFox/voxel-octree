@@ -1,6 +1,6 @@
 export interface OctreeNode {
     data: number;
-    children?: OctreeNode[];
+    children?: {[key: number]: OctreeNode};
 }
 
 export interface TraversalInfo {
@@ -23,22 +23,17 @@ export function modify(info: TraversalInfo, p1: number[], p2: number[], value: n
         delete info.node.children; // TODO recycling of Nodes can improve the gc performance.
     } else {
         // update
+        // if (info.size === 2) {
+        //     info.node.data = value;
+        //     return;
+        // }
+
         if (!info.node.children) {
-            info.node.children = [
-                { data: info.node.data },
-                { data: info.node.data },
-                { data: info.node.data },
-                { data: info.node.data },
-                { data: info.node.data },
-                { data: info.node.data },
-                { data: info.node.data },
-                { data: info.node.data }
-            ]
+            info.node.children = {};
         }
 
         // cut update down
         const childSize = info.size / 2;
-
         const x0 = lowerRange(p1[0], p2[0], childSize);
         const y0 = lowerRange(p1[1], p2[1], childSize);
         const z0 = lowerRange(p1[2], p2[2], childSize);
@@ -61,7 +56,11 @@ export function modify(info: TraversalInfo, p1: number[], p2: number[], value: n
                 if (z0) {
                     // const cIndex = childIndex([0, 0, 0]);
                     const cIndex = 0;
+
                     childInfo.node = info.node.children[cIndex];
+                    if (!childInfo.node) {
+                        childInfo.node = info.node.children[cIndex] = { data: info.node.data };
+                    }
                     modify(childInfo, [x0[0], y0[0], z0[0]], [x0[1], y0[1], z0[1]], value);
                 }
 
@@ -69,6 +68,9 @@ export function modify(info: TraversalInfo, p1: number[], p2: number[], value: n
                     // const cIndex = childIndex([0, 0, 1]);
                     const cIndex = 4;
                     childInfo.node = info.node.children[cIndex];
+                    if (!childInfo.node) {
+                        childInfo.node = info.node.children[cIndex] = { data: info.node.data };
+                    }
                     modify(childInfo, [x0[0], y0[0], z1[0]], [x0[1], y0[1], z1[1]], value);
                 }
             }
@@ -78,6 +80,9 @@ export function modify(info: TraversalInfo, p1: number[], p2: number[], value: n
                     // const cIndex = childIndex([0, 1, 0]);
                     const cIndex = 2;
                     childInfo.node = info.node.children[cIndex];
+                    if (!childInfo.node) {
+                        childInfo.node = info.node.children[cIndex] = { data: info.node.data };
+                    }
                     modify(childInfo, [x0[0], y1[0], z0[0]], [x0[1], y1[1], z0[1]], value);
                 }
 
@@ -85,6 +90,9 @@ export function modify(info: TraversalInfo, p1: number[], p2: number[], value: n
                     // const cIndex = childIndex([0, 1, 1]);
                     const cIndex = 6;
                     childInfo.node = info.node.children[cIndex];
+                    if (!childInfo.node) {
+                        childInfo.node = info.node.children[cIndex] = { data: info.node.data };
+                    }
                     modify(childInfo, [x0[0], y1[0], z1[0]], [x0[1], y1[1], z1[1]], value);
                 }
             }
@@ -96,6 +104,9 @@ export function modify(info: TraversalInfo, p1: number[], p2: number[], value: n
                     // const cIndex = childIndex([1, 0, 0]);
                     const cIndex = 1;
                     childInfo.node = info.node.children[cIndex];
+                    if (!childInfo.node) {
+                        childInfo.node = info.node.children[cIndex] = { data: info.node.data };
+                    }
                     modify(childInfo, [x1[0], y0[0], z0[0]], [x1[1], y0[1], z0[1]], value);
                 }
 
@@ -103,6 +114,9 @@ export function modify(info: TraversalInfo, p1: number[], p2: number[], value: n
                     // const cIndex = childIndex([1, 0, 1]);
                     const cIndex = 5;
                     childInfo.node = info.node.children[cIndex];
+                    if (!childInfo.node) {
+                        childInfo.node = info.node.children[cIndex] = { data: info.node.data };
+                    }
                     modify(childInfo, [x1[0], y0[0], z1[0]], [x1[1], y0[1], z1[1]], value);
                 }
             }
@@ -112,12 +126,18 @@ export function modify(info: TraversalInfo, p1: number[], p2: number[], value: n
                     // const cIndex = childIndex([1, 1, 0]);
                     const cIndex = 3
                     childInfo.node = info.node.children[cIndex];
+                    if (!childInfo.node) {
+                        childInfo.node = info.node.children[cIndex] = { data: info.node.data };
+                    }
                     modify(childInfo, [x1[0], y1[0], z0[0]], [x1[1], y1[1], z0[1]], value);
                 }
                 if (z1) {
                     // const cIndex = childIndex([1, 1, 1]);
                     const cIndex = 7;
                     childInfo.node = info.node.children[cIndex];
+                    if (!childInfo.node) {
+                        childInfo.node = info.node.children[cIndex] = { data: info.node.data };
+                    }
                     modify(childInfo, [x1[0], y1[0], z1[0]], [x1[1], y1[1], z1[1]], value);
                 }
             }

@@ -40,6 +40,7 @@ export class OctreeGrid {
 			worker.work(chunk.id, JSON.stringify(this.chunks), chunkMesh.mesh ? Transfer(chunkMesh.mesh) : undefined).then((mesh) => {
 				chunkMesh.mesh = mesh.buffer.send;
 				chunkMesh.vertexCount = mesh.vertexCount;
+				console.log(new Float32Array(chunkMesh.mesh));
 				chunkMesh.meshUpdated = true;
 				this.pool.push(worker);
 				this.balanceWork();
@@ -74,6 +75,10 @@ export class OctreeGrid {
                         p2[1] <= chunkAbsEndY ? p2[1] % this.scale : this.scale - 1,
                         p2[2] <= chunkAbsEndZ ? p2[2] % this.scale : this.scale - 1
                     ];
+
+					relEndPoint[0] = relEndPoint[0] < 0 ? 1024 + relEndPoint[0] : relEndPoint[0]
+					relEndPoint[1] = relEndPoint[1] < 0 ? 1024 + relEndPoint[1] : relEndPoint[1]
+					relEndPoint[2] = relEndPoint[2] < 0 ? 1024 + relEndPoint[2] : relEndPoint[2]
 
                     const id = [x, y, z];
                     let chunk = this.chunks[map3D1D(id)];
@@ -120,8 +125,15 @@ export class OctreeGrid {
 	}
 
 	updateMesh(chunk: Chunk) {
-		this.queue.push(chunk);
-		this.balanceWork();
+		if (this.queue.findIndex(c =>
+			c.id[0] === chunk.id[0] &&
+			c.id[1] === chunk.id[1] &&
+			c.id[2] === chunk.id[2]
+		) === -1) {
+			this.queue.push(chunk);
+		}
+
+		// this.balanceWork();
 	}
 
 }
