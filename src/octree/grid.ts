@@ -32,8 +32,20 @@ export class OctreeGrid {
 	}
 
 	balanceWork() {
-		while (this.queue[0] && this.pool[0]) {
-			const chunk = this.queue.shift();
+		while (this.pool[0]) {
+
+			// find chunk in queue that is save to update
+			const index = this.queue.findIndex(c => {
+				const mesh = this.meshes[map3D1D(c.id)];
+				return mesh.mesh !== undefined && !mesh.meshUpdated
+			});
+			let chunk;
+			if (~index){
+				chunk = this.queue.splice(index, 1)[0];
+			} else {
+				break;
+			}
+
 			const worker = this.pool.shift();
 			const chunkMesh = this.meshes[map3D1D(chunk.id)];
 
@@ -44,6 +56,7 @@ export class OctreeGrid {
 				this.pool.push(worker);
 				this.balanceWork();
 			});
+			chunkMesh.mesh = undefined;
 		}
 	}
 
@@ -92,7 +105,7 @@ export class OctreeGrid {
 						this.meshes[map3D1D(id)] = {
 							id,
 							meshUpdated: false,
-							mesh: undefined
+							mesh: null
 						}
 					}
 
