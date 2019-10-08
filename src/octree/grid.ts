@@ -40,7 +40,6 @@ export class OctreeGrid {
 			worker.work(chunk.id, JSON.stringify(this.chunks), chunkMesh.mesh ? Transfer(chunkMesh.mesh) : undefined).then((mesh) => {
 				chunkMesh.mesh = mesh.buffer.send;
 				chunkMesh.vertexCount = mesh.vertexCount;
-				console.log(new Float32Array(chunkMesh.mesh));
 				chunkMesh.meshUpdated = true;
 				this.pool.push(worker);
 				this.balanceWork();
