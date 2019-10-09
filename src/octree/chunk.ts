@@ -1,4 +1,4 @@
-import {OctreeNode} from "./node";
+import {OctreeNode} from "./worker/node";
 
 export interface Chunk {
 	id: number[]
@@ -7,7 +7,6 @@ export interface Chunk {
 
 export interface Mesh {
 	id: number[]
-	mesh?: ArrayBuffer
-	meshUpdated?: boolean
+	mesh?: any
 	vertexCount?: number
 }

@@ -1,12 +1,7 @@
-import {expose, Transfer, TransferDescriptor} from "threads/dist";
-import {Chunk} from "./chunk";
-import {childIndex, OctreeNode, TraversalInfo} from "./node";
-import {childDirections, map3D1D} from "./util";
-import {checkServerIdentity} from "tls";
+import {TraversalInfo} from "./node";
+import {childDirections} from "../util";
 
-const minOffset = 0.0009765625;
-
-function createMesh(out: Float32Array, info: TraversalInfo, vertexIndex: number): number {
+export function createMesh(out: Float32Array, info: TraversalInfo, vertexIndex: number): number {
 	if (info.node.children) {
 		for (const childID in info.node.children) {
 			const childDirection = childDirections[childID];
@@ -212,32 +207,3 @@ function createMesh(out: Float32Array, info: TraversalInfo, vertexIndex: number)
 		return vertexIndex;
 	}
 }
-
-
-const worker = {
-
-    work(id: number[], chunks: string, mesh?) {
-
-
-    	const parsed = JSON.parse(chunks);
-    	const master = parsed[map3D1D(id)];
-    	const f32 = mesh ? new Float32Array(mesh) : new Float32Array(16777216 * 3);
-    	const info: TraversalInfo = {
-    		depth: 0,
-			position: [0, 0, 0],
-			size: 0.5,
-			node: master.tree
-		};
-
-    	const f32Count = createMesh(f32, info, 0);
-
-        return {
-        	vertexCount: f32Count / 3,
-        	buffer: Transfer(f32.buffer)
-        };
-    }
-};
-
-export type IndexWorker = typeof worker;
-
-expose(worker);

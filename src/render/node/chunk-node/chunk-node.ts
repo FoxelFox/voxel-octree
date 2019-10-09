@@ -5,6 +5,7 @@ import {Camera} from "../../camera";
 import {OctreeGrid} from "../../../octree/grid";
 import {map3D1D} from "../../../octree/util";
 import {Chunk, Mesh} from "../../../octree/chunk";
+import {Transfer} from "threads/worker";
 
 
 interface Model {
@@ -19,6 +20,7 @@ export class ChunkNode {
 	shader: Shader;
 	frameBuffer!: FrameBuffer;
 	models: { [key: number]: Model } = {};
+	uploadQueue = [];
 
 	constructor (
 		private camera: Camera,
@@ -33,29 +35,15 @@ export class ChunkNode {
 	init(): void {
 		const output = new Texture();
 		this.frameBuffer = new FrameBuffer([output], false, true);
+		this.grid.getNext().then(n => {
+			if (n) {
+				this.uploadQueue.push(n);
+			}
+		})
 	}
 
 	run() {
-		this.updateMeshes();
 		this.render();
-	}
-
-	updateMeshes() {
-		for (const key in this.grid.meshes) {
-			const chunk = this.grid.meshes[key];
-			if (chunk.meshUpdated) {
-				if (!this.models[key]) {
-					this.models[key] = this.createMeshGPU(chunk);
-				} else {
-					this.models[key].position.updateBuffer(chunk.mesh, 4 * chunk.vertexCount);
-					this.models[key].vertexCount = chunk.vertexCount;
-				}
-				chunk.meshUpdated = false;
-
-				//this.grid.updateMesh(this.grid.chunks[map3D1D(chunk.id)]) // REMOVE
-				// break; // only update one mesh per Frame
-			}
-		}
 	}
 
 	createMeshGPU(chunk: Mesh): Model {
@@ -75,7 +63,27 @@ export class ChunkNode {
 		return { vao, position, matrix, vertexCount: chunk.vertexCount };
 	}
 
+	upload() {
+		if (this.uploadQueue[0]) {
+			const chunk = this.uploadQueue.shift();
+			chunk.mesh = chunk.mesh.send;
+			if (!this.models[chunk.id]) {
+				this.models[chunk.id] = this.createMeshGPU(chunk);
+			} else {
+				this.models[chunk.id].position.updateBuffer(chunk.mesh, 4 * chunk.vertexCount);
+				this.models[chunk.id].vertexCount = chunk.vertexCount;
+			}
+
+		}
+		this.grid.getNext().then(n => {
+			if (n) {
+				this.uploadQueue.push(n);
+			}
+		})
+	}
+
 	render() {
+		this.upload();
 		this.frameBuffer.bind();
 		gl.enable(gl.DEPTH_TEST);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

@@ -18,7 +18,7 @@ export class Pipeline {
 		this.output = new OutputNode(this.chunkNode.frameBuffer.textures[0]);
 		this.output.init();
 
-		document.addEventListener("keydown", (element) => {
+		document.addEventListener("keydown", async (element) => {
 			switch (element.key) {
 				case "e":
 				case "E":
@@ -26,18 +26,22 @@ export class Pipeline {
 					const start = [Math.floor(p[0] * -1024 + 512), Math.floor(p[1] * -1024 + 512), Math.floor(p[2] * -1024 + 512)];
 					const end = [start[0], start[1], start[2]];
 					grid.modify(start, end, 1);
-					console.log(start, end);
-					break;
 			}
 
 		});
 
+		grid.modify([-1024, -1024, 0], [2047, 2047, 63], 1);
+
+
 	}
 
 	run() {
-		this.grid.balanceWork();
 		this.camera.update();
 		this.chunkNode.run();
 		this.output.run();
+	}
+
+	meshesIncoming(meshes) {
+
 	}
 }
