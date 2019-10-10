@@ -1,5 +1,6 @@
 import {TraversalInfo} from "./node";
-import {childDirections} from "../util";
+import {childDirections, map3D1D} from "../util";
+import {expose, Transfer} from "threads/worker";
 
 export function createMesh(out: Float32Array, info: TraversalInfo, vertexIndex: number): number {
 	if (info.node.children) {
@@ -207,3 +208,30 @@ export function createMesh(out: Float32Array, info: TraversalInfo, vertexIndex: 
 		return vertexIndex;
 	}
 }
+
+const worker = {
+
+	work(id: number[], chunks: string, mesh?) {
+		const parsed = JSON.parse(chunks);
+		const master = parsed[map3D1D(id)];
+		const b = mesh ? mesh : new SharedArrayBuffer(1048576 * 3 * 4);
+		const f32 = new Float32Array(b);
+		const info: TraversalInfo = {
+			depth: 0,
+			position: [0, 0, 0],
+			size: 0.5,
+			node: master.tree
+		};
+
+		const f32Count = createMesh(f32, info, 0);
+
+		return {
+			vertexCount: f32Count / 3,
+			mesh: f32.buffer
+		};
+	}
+};
+
+export type MeshGeneratorWorker = typeof worker;
+
+expose(worker);

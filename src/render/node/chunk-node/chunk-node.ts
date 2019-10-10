@@ -66,14 +66,15 @@ export class ChunkNode {
 	upload() {
 		if (this.uploadQueue[0]) {
 			const chunk = this.uploadQueue.shift();
-			chunk.mesh = chunk.mesh.send;
-			if (!this.models[chunk.id]) {
-				this.models[chunk.id] = this.createMeshGPU(chunk);
-			} else {
-				this.models[chunk.id].position.updateBuffer(chunk.mesh, 4 * chunk.vertexCount);
-				this.models[chunk.id].vertexCount = chunk.vertexCount;
-			}
+			const chunkID = map3D1D(chunk.id);
 
+			if (!this.models[chunkID]) {
+				this.models[chunkID] = this.createMeshGPU(chunk);
+			} else {
+				this.models[chunkID].position.updateBuffer(chunk.mesh, 4 * chunk.vertexCount);
+				this.models[chunkID].vertexCount = chunk.vertexCount;
+			}
+			this.grid.meshUploaded(chunkID)
 		}
 		this.grid.getNext().then(n => {
 			if (n) {

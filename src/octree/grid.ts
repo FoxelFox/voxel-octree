@@ -1,29 +1,31 @@
-import {ModuleThread, spawn, Worker, Transfer, expose, Pool} from "threads/dist";
-import {IndexWorker} from "./worker/worker";
+import {spawn, Worker, Transfer, expose, Pool} from "threads/dist";
 import {modify} from "./worker/node";
 import {map3D1D} from "./util";
 import {Chunk, Mesh} from "./chunk";
 import {Observable} from "threads/dist/observable";
+import {MeshGeneratorWorker} from "./worker/mesh-generator";
 
 
 const queue: Chunk[] = [];
 const chunks: { [key: number]: Chunk } = {};
 const meshes: { [key: number]: Mesh } = {};
+const lockedBuffer: { [key: number]: Mesh } = {};
 const scale = 1024;
 let meshObserver;
 let pool;
 let results = [];
+
 function getChunkID(position: number[]): number[] {
 	return [
 		Math.floor(position[0] / scale),
 		Math.floor(position[1] / scale),
 		Math.floor(position[2] / scale)
 	];
-};
+}
 
 function getChuckByID(chunkID: number[]): Chunk {
 	return chunks[map3D1D(chunkID)];
-};
+}
 
 function updateMesh(chunk: Chunk) {
 	if (queue.findIndex(c =>
@@ -38,20 +40,34 @@ function updateMesh(chunk: Chunk) {
 async function balanceWork() {
 
 	while (queue[0]) {
-		const chunk = queue.shift();
-		const chunkMesh = meshes[map3D1D(chunk.id)];
+		const chunk = queue[0];
+		const chunkID = map3D1D(chunk.id);
+		const chunkMesh = meshes[chunkID];
+
+		if (chunkMesh.mesh === undefined) {
+
+			console.log("save")
+			break;
+		}
+
+		queue.shift();
 
 		pool.queue(async worker => {
-			await worker.work(chunk.id, JSON.stringify(chunks), chunkMesh.mesh ? Transfer(chunkMesh.mesh) : undefined).then((mesh) => {
-				chunkMesh.mesh = mesh.mesh.send;
+			await worker.work(chunk.id, JSON.stringify(chunks), chunkMesh.mesh ? chunkMesh.mesh : undefined).then((mesh) => {
+
 				chunkMesh.vertexCount = mesh.vertexCount;
 				results.push({
-					mesh: Transfer(chunkMesh.mesh),
-					id: chunkMesh.id,
+					mesh: mesh.mesh,
+					id: chunk.id,
 					vertexCount: chunkMesh.vertexCount
 				});
 			});
+
+
 		})
+
+		lockedBuffer[chunkID] = chunkMesh.mesh;
+		chunkMesh.mesh = undefined;
 	}
 
 	await pool.completed();
@@ -64,7 +80,7 @@ const octreeGrid = {
 
 	async initThreads() {
 		const maxWorkerThreads = Math.max(1, navigator.hardwareConcurrency -2);
-		pool = Pool(() => spawn<IndexWorker>(new Worker("./worker/worker")), maxWorkerThreads)
+		pool = Pool(() => spawn<MeshGeneratorWorker>(new Worker("./worker/mesh-generator")), maxWorkerThreads)
 	},
 
 	meshChanges() {
@@ -73,11 +89,12 @@ const octreeGrid = {
 		})
 	},
 
-	meshUploaded(id: number, mesh) {
-		meshes[id].mesh = mesh.send;
+	meshUploaded(id: number) {
+		meshes[id].mesh = lockedBuffer[id];
+		balanceWork()
 	},
 
-	modify(p1: number[], p2: number[], value: number) {
+	async modify(p1: number[], p2: number[], value: number) {
 
 		const startChunkIDCoords = getChunkID(p1);
 		const endChunkIDCoords = getChunkID(p2);
@@ -135,7 +152,7 @@ const octreeGrid = {
                     modify(info, relStartPoint, relEndPoint, value);
 
 					updateMesh(chunk);
-					balanceWork();
+					await balanceWork();
 				}
 			}
 		}
