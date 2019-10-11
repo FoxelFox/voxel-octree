@@ -9,7 +9,7 @@ import {MeshGeneratorWorker} from "./worker/mesh-generator";
 const queue: Chunk[] = [];
 const chunks: { [key: number]: Chunk } = {};
 const meshes: { [key: number]: Mesh } = {};
-const lockedBuffer: { [key: number]: Mesh } = {};
+const lockedBuffer: { [key: number]: boolean } = {};
 const scale = 1024;
 let meshObserver;
 let pool;
@@ -37,22 +37,25 @@ function updateMesh(chunk: Chunk) {
 	}
 }
 
-async function balanceWork() {
+function balanceWork() {
 
 	while (queue[0]) {
 		const chunk = queue[0];
 		const chunkID = map3D1D(chunk.id);
 		const chunkMesh = meshes[chunkID];
 
-		if (chunkMesh.mesh === undefined) {
+		if (lockedBuffer[chunkID]) {
 			break;
 		}
 
 		queue.shift();
 
+		lockedBuffer[chunkID] = true;
 		pool.queue(async worker => {
-			await worker.work(chunk.id, JSON.stringify(chunks), chunkMesh.mesh ? chunkMesh.mesh : undefined).then((mesh) => {
-
+			worker.work(chunk.id, JSON.stringify(chunks), chunkMesh.mesh ? chunkMesh.mesh : undefined).then((mesh) => {
+				if (!chunkMesh.mesh) {
+					chunkMesh.mesh = mesh.mesh;
+				}
 				chunkMesh.vertexCount = mesh.vertexCount;
 				results.push({
 					mesh: mesh.mesh,
@@ -60,18 +63,9 @@ async function balanceWork() {
 					vertexCount: chunkMesh.vertexCount
 				});
 			});
-
-
 		})
-
-		lockedBuffer[chunkID] = chunkMesh.mesh;
-		chunkMesh.mesh = undefined;
 	}
-
-	await pool.completed();
-	return results;
-
-};
+}
 
 
 const octreeGrid = {
@@ -88,7 +82,7 @@ const octreeGrid = {
 	},
 
 	meshUploaded(id: number) {
-		meshes[id].mesh = lockedBuffer[id];
+		lockedBuffer[id] = false;
 		balanceWork()
 	},
 
@@ -150,10 +144,10 @@ const octreeGrid = {
                     modify(info, relStartPoint, relEndPoint, value);
 
 					updateMesh(chunk);
-					await balanceWork();
 				}
 			}
 		}
+		balanceWork();
 	},
 
 	getNext() {

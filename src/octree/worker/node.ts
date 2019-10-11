@@ -141,9 +141,7 @@ export function modify(info: TraversalInfo, p1: number[], p2: number[], value: n
             }
 
             if (canMerge) {
-                // info.node.data = value;
                 delete info.node.children;
-                console.log("merged")
             }
         }
     }

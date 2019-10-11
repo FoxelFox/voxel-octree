@@ -217,7 +217,7 @@ const worker = {
 		if (!mesh) {
 			console.log("created new buffer")
 		}
-		const b = mesh ? mesh : new SharedArrayBuffer(4194304 * 3 * 4);
+		const b = mesh ? mesh : new SharedArrayBuffer(16777216 * 3 * 4);
 		const f32 = new Float32Array(b);
 		const info: TraversalInfo = {
 			depth: 0,
