@@ -214,7 +214,10 @@ const worker = {
 	work(id: number[], chunks: string, mesh?) {
 		const parsed = JSON.parse(chunks);
 		const master = parsed[map3D1D(id)];
-		const b = mesh ? mesh : new SharedArrayBuffer(1048576 * 3 * 4);
+		if (!mesh) {
+			console.log("created new buffer")
+		}
+		const b = mesh ? mesh : new SharedArrayBuffer(4194304 * 3 * 4);
 		const f32 = new Float32Array(b);
 		const info: TraversalInfo = {
 			depth: 0,

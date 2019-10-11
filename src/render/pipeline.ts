@@ -53,7 +53,7 @@ export class Pipeline {
 		if (this.placeVoxel) {
 			const p = this.camera.position;
 			const start = [Math.floor(p[0] * -1024 + 512), Math.floor(p[1] * -1024 + 512), Math.floor(p[2] * -1024 + 512)];
-			const end = [start[0], start[1], start[2]];
+			const end = [start[0] + 7, start[1] +7, start[2] +7];
 			this.grid.modify(start, end, 1);
 		}
 	}

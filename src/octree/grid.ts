@@ -45,8 +45,6 @@ async function balanceWork() {
 		const chunkMesh = meshes[chunkID];
 
 		if (chunkMesh.mesh === undefined) {
-
-			console.log("save")
 			break;
 		}
 
