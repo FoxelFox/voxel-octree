@@ -6,7 +6,9 @@ uniform mat4 mvp;
 
 
 in vec3 position;
+in vec3 normal;
 out vec4 v_color;
+out vec3 v_normal;
 out vec3 wire;
 
 void main() {
@@ -15,6 +17,8 @@ void main() {
 
     v_color.rgb = position;
     v_color.w = length(gl_Position.xyz);
+
+    v_normal = normal;
 
     int id = gl_VertexID % 3;
 

@@ -42,31 +42,51 @@ export function createMesh(out: Float32Array, info: TraversalInfo, vertexIndex: 
 			(info.position[2] + offset + 0.5) * 1024
 		];
 
+		// Welcome prototype to hell.
+
 		// top 1
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 1;
 
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 1;
 
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 1;
 
 		// top 2
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 1;
 
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 1;
 
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 1;
 
 
 		// bottom 1
@@ -74,135 +94,224 @@ export function createMesh(out: Float32Array, info: TraversalInfo, vertexIndex: 
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = -1;
 
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = -1;
 
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = -1;
 
 		// bottom 2
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = -1;
 
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = -1;
 
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] - offset;
-
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = -1;
 
 		// Front 1
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 1;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 1;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 1;
+		out[vertexIndex++] = 0;
 
 		// Front 2
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 1;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 1;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 1;
+		out[vertexIndex++] = 0;
 
 		// back 1
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = -1;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = -1;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = -1;
+		out[vertexIndex++] = 0;
 
 		// back 2
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = -1;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = -1;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = -1;
+		out[vertexIndex++] = 0;
 
 
 		// right 1
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = 1;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = 1;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = 1;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
 
 		// right 2
 
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = 1;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = 1;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] + offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = 1;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
 
 		// left 1
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = -1;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = -1;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = -1;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
 
 		// left 2
 
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = -1;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] + offset;
 		out[vertexIndex++] = info.position[2] - offset;
+		out[vertexIndex++] = -1;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
 
 		out[vertexIndex++] = info.position[0] - offset;
 		out[vertexIndex++] = info.position[1] - offset;
 		out[vertexIndex++] = info.position[2] + offset;
+		out[vertexIndex++] = -1;
+		out[vertexIndex++] = 0;
+		out[vertexIndex++] = 0;
 
 
 		return vertexIndex;
@@ -229,7 +338,7 @@ const worker = {
 		const f32Count = createMesh(f32, info, 0);
 
 		return {
-			vertexCount: f32Count / 3,
+			vertexCount: f32Count / 6,
 			mesh: f32.buffer
 		};
 	}

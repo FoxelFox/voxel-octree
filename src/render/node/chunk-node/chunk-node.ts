@@ -48,14 +48,20 @@ export class ChunkNode {
 
 	createMeshGPU(chunk: Mesh): Model {
 		const vao = gl.createVertexArray() as WebGLVertexArrayObject;
-		const position = new ArrayBufferNative(chunk.mesh, 4 * chunk.vertexCount, 3, gl.FLOAT);
+		const position = new ArrayBufferNative(chunk.mesh, 4 * chunk.vertexCount * 2, 3, gl.FLOAT);
 		const positionAttribute = this.shader.getAttributeLocation("position");
+		const normalAttribute = this.shader.getAttributeLocation("normal");
 		const matrix = mat4.create();
 
 		gl.bindVertexArray(vao);
 		gl.bindBuffer(gl.ARRAY_BUFFER, position.buffer);
+
 		gl.enableVertexAttribArray(positionAttribute);
-		gl.vertexAttribPointer(positionAttribute, position.size, position.type, position.normalize, position.stride, position.offset);
+		gl.vertexAttribPointer(positionAttribute, 3, position.type, position.normalize, 4*3*2 , 0);
+
+		gl.enableVertexAttribArray(normalAttribute);
+		gl.vertexAttribPointer(normalAttribute, 3, position.type, position.normalize, 4*3*2, 4*3);
+
 		gl.bindVertexArray(null);
 
 		mat4.fromTranslation(matrix, chunk.id);
@@ -71,7 +77,7 @@ export class ChunkNode {
 			if (!this.models[chunkID]) {
 				this.models[chunkID] = this.createMeshGPU(chunk);
 			} else {
-				this.models[chunkID].position.updateBuffer(chunk.mesh, 4 * chunk.vertexCount);
+				this.models[chunkID].position.updateBuffer(chunk.mesh, 4 * chunk.vertexCount * 2);
 				this.models[chunkID].vertexCount = chunk.vertexCount;
 			}
 			this.grid.meshUploaded(chunkID)
