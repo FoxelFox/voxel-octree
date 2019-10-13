@@ -10,6 +10,7 @@ export const gl = canvas.getContext("webgl2", {
 }) as WebGL2RenderingContext;
 setContext(gl);
 
+gl.getExtension("EXT_color_buffer_float");
 gl.enable(gl.CULL_FACE);
 //gl.cullFace(gl.FRONT_FACE);
 

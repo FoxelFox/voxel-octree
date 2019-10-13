@@ -2,11 +2,14 @@ import {ChunkNode} from "./node/chunk-node/chunk-node";
 import {OutputNode} from "./node/output/output";
 import {Camera} from "./camera";
 import {OctreeGrid} from "../octree/grid";
+import {EditNode} from "./node/edit/edit-node";
 
 export class Pipeline {
 
 	chunkNode: ChunkNode;
 	output: OutputNode;
+	edit: EditNode;
+
 	camera: Camera;
 
 	placeVoxel: boolean = false;
@@ -16,6 +19,9 @@ export class Pipeline {
 
 		this.chunkNode = new ChunkNode(this.camera, grid);
 		this.chunkNode.init();
+
+		this.edit = new EditNode(undefined, this.camera, grid);
+		this.edit.init();
 
 		this.output = new OutputNode(this.chunkNode.frameBuffer.textures[0]);
 		this.output.init();
@@ -45,9 +51,8 @@ export class Pipeline {
 	run() {
 		this.camera.update();
 
-
-
 		this.chunkNode.run();
+		this.edit.run();
 		this.output.run();
 
 		if (this.placeVoxel) {

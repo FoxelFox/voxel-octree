@@ -34,7 +34,10 @@ export class ChunkNode {
 
 	init(): void {
 		const output = new Texture();
-		this.frameBuffer = new FrameBuffer([output], false, true);
+		const normal = new Texture(undefined, undefined, null, gl.RGBA32F, gl.RGBA, gl.FLOAT);
+		const position = new Texture(undefined, undefined, null, gl.RGBA32F, gl.RGBA, gl.FLOAT);
+
+		this.frameBuffer = new FrameBuffer([output, normal, position], false, true);
 		this.grid.getNext().then(n => {
 			if (n) {
 				this.uploadQueue.push(n);
@@ -110,6 +113,7 @@ export class ChunkNode {
 			mat4.mul(mvp, this.camera.view, model.matrix);
 			mat4.mul(mvp, this.camera.perspective, mvp);
 			gl.uniformMatrix4fv(this.shader.getUniformLocation("mvp"), false, mvp);
+			gl.uniform3fv(this.shader.getUniformLocation("offset"), [model.matrix[12], model.matrix[13], model.matrix[14]])
 
 			gl.bindVertexArray(model.vao);
 			gl.drawArrays(gl.TRIANGLES, 0, model.vertexCount);
