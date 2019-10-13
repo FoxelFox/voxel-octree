@@ -4,8 +4,6 @@ uniform mat4 mvp;
 
 in vec4 position;
 out vec4 v_color;
-out vec4 v_normal;
-out vec4 v_position;
 
 void main() {
     gl_Position = mvp * position;
