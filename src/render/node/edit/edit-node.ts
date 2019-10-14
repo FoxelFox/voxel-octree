@@ -62,10 +62,31 @@ export class EditNode extends SimpleNode {
 		document.addEventListener("click", (e) => {
 			if (document.pointerLockElement) {
 
+
 				const start = [this.readPixelPosition[0] * 1024 + 1024 * 0.5 - this.size * 0.5, this.readPixelPosition[1] * 1024 + 1024 * 0.5 - this.size * 0.5,this.readPixelPosition[2] * 1024 + 1024 * 0.5 - this.size * 0.5];
 				const end = [start[0] + this.size -1, start[1] + this.size -1, start[2] + this.size -1];
 
-				this.grid.modify(start, end, 1);
+
+				switch (e.button) {
+					case 0:
+						this.grid.modify([
+							start[0] + this.size * this.readPixelNormal[0] * -1,
+							start[1] + this.size * this.readPixelNormal[1] * -1,
+							start[2] + this.size * this.readPixelNormal[2] * -1,
+						], [
+							end[0] + this.size * this.readPixelNormal[0] * -1,
+							end[1] + this.size * this.readPixelNormal[1] * -1,
+							end[2] + this.size * this.readPixelNormal[2] * -1,
+						], 0);
+
+						break;
+
+					case 2:
+						this.grid.modify(start, end, 1);
+						break;
+				}
+
+
 			}
 		})
 	}
