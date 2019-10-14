@@ -79,9 +79,9 @@ export class EditNode extends SimpleNode {
 
 
 
-		let cx = Math.floor(Math.floor(this.readPixelPosition[0] * 1024) / this.size + 0.5) * this.size;
-		let cy = Math.floor(Math.floor(this.readPixelPosition[1] * 1024) / this.size + 0.5) * this.size;
-		let cz = Math.floor(Math.floor(this.readPixelPosition[2] * 1024) / this.size + 0.5) * this.size;
+		let cx = Math.floor(Math.floor(this.readPixelPosition[0] * 1024) / this.size ) * this.size;
+		let cy = Math.floor(Math.floor(this.readPixelPosition[1] * 1024) / this.size ) * this.size;
+		let cz = Math.floor(Math.floor(this.readPixelPosition[2] * 1024) / this.size ) * this.size;
 
 		// grid snapping
 		let x = cx - 0.5 * this.size * (Math.abs(this.readPixelNormal[0]) -1) + this.readPixelNormal[0] * 0.5 * this.size;
