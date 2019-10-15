@@ -127,9 +127,9 @@ export class EditNode extends SimpleNode {
 
 
 		mat4.fromTranslation(matrix, [
-			this.readPixelPosition[0],
-			this.readPixelPosition[1],
-			this.readPixelPosition[2]
+			this.readPixelPosition[0] - this.scale * this.readPixelNormal[0],
+			this.readPixelPosition[1] - this.scale * this.readPixelNormal[1],
+			this.readPixelPosition[2] - this.scale * this.readPixelNormal[2]
 		]);
 
 
@@ -144,8 +144,15 @@ export class EditNode extends SimpleNode {
 		gl.uniformMatrix4fv(this.shader.getUniformLocation("mvp"), false, mvp);
 
 
+
 		gl.useProgram(this.shader.program);
 		gl.bindVertexArray(this.vao);
+
+		gl.enable(gl.BLEND);
+
 		gl.drawArrays(gl.LINES, 0, 24);
+
+		gl.disable(gl.BLEND);
+		// gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	}
 }
