@@ -5,8 +5,8 @@ export interface Chunk {
 	tree: OctreeNode
 }
 
-export interface Mesh {
+export interface VoxelsOnGPU {
 	id: number[]
-	mesh?: any
-	vertexCount?: number
+	data?: any
+	elements?: number
 }

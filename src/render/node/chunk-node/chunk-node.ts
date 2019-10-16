@@ -4,7 +4,7 @@ import {mat4} from "gl-matrix";
 import {Camera} from "../../camera";
 import {OctreeGrid} from "../../../octree/grid";
 import {map3D1D} from "../../../octree/util";
-import {Chunk, Mesh} from "../../../octree/chunk";
+import {Chunk, VoxelsOnGPU} from "../../../octree/chunk";
 import {Transfer} from "threads/worker";
 
 
@@ -49,9 +49,9 @@ export class ChunkNode {
 		this.render();
 	}
 
-	createMeshGPU(chunk: Mesh): Model {
+	createMeshGPU(chunk: VoxelsOnGPU): Model {
 		const vao = gl.createVertexArray() as WebGLVertexArrayObject;
-		const position = new ArrayBufferNative(chunk.mesh, 4 * chunk.vertexCount * 2, 3, gl.FLOAT);
+		const position = new ArrayBufferNative(chunk.data, 4 * chunk.elements * 2, 3, gl.FLOAT);
 		const positionAttribute = this.shader.getAttributeLocation("position");
 		const normalAttribute = this.shader.getAttributeLocation("normal");
 		const matrix = mat4.create();
@@ -69,7 +69,7 @@ export class ChunkNode {
 
 		mat4.fromTranslation(matrix, chunk.id);
 
-		return { vao, position, matrix, vertexCount: chunk.vertexCount };
+		return { vao, position, matrix, vertexCount: chunk.elements };
 	}
 
 	upload() {
@@ -80,8 +80,8 @@ export class ChunkNode {
 			if (!this.models[chunkID]) {
 				this.models[chunkID] = this.createMeshGPU(chunk);
 			} else {
-				this.models[chunkID].position.updateBuffer(chunk.mesh, 4 * chunk.vertexCount * 2);
-				this.models[chunkID].vertexCount = chunk.vertexCount;
+				this.models[chunkID].position.updateBuffer(chunk.data, 4 * chunk.elements * 2);
+				this.models[chunkID].vertexCount = chunk.elements;
 			}
 			this.grid.meshUploaded(chunkID)
 		}

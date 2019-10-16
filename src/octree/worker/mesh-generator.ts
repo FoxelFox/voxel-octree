@@ -340,8 +340,8 @@ const worker = {
 		const f32Count = createMesh(f32, info, 0);
 
 		return {
-			vertexCount: f32Count / 6,
-			mesh: f32.buffer
+			elements: f32Count / 6,
+			data: f32.buffer
 		};
 	}
 };

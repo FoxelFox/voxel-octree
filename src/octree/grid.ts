@@ -1,14 +1,14 @@
 import {spawn, Worker, Transfer, expose, Pool} from "threads/dist";
 import {modify} from "./worker/node";
 import {map3D1D} from "./util";
-import {Chunk, Mesh} from "./chunk";
+import {Chunk, VoxelsOnGPU} from "./chunk";
 import {Observable} from "threads/dist/observable";
 import {MeshGeneratorWorker} from "./worker/mesh-generator";
 
 
 const queue: Chunk[] = [];
 const chunks: { [key: number]: Chunk } = {};
-const meshes: { [key: number]: Mesh } = {};
+const meshes: { [key: number]: VoxelsOnGPU } = {};
 const lockedBuffer: { [key: number]: boolean } = {};
 const scale = 1024;
 let meshObserver;
@@ -52,15 +52,15 @@ function balanceWork() {
 
 		lockedBuffer[chunkID] = true;
 		pool.queue(async worker => {
-			worker.work(chunk.id, JSON.stringify(chunks), chunkMesh.mesh ? chunkMesh.mesh : undefined).then((mesh) => {
-				if (!chunkMesh.mesh) {
-					chunkMesh.mesh = mesh.mesh;
+			worker.work(chunk.id, JSON.stringify(chunks), chunkMesh.data ? chunkMesh.data : undefined).then((mesh) => {
+				if (!chunkMesh.data) {
+					chunkMesh.data = mesh.data;
 				}
-				chunkMesh.vertexCount = mesh.vertexCount;
+				chunkMesh.elements = mesh.elements;
 				results.push({
-					mesh: mesh.mesh,
+					data: mesh.data,
 					id: chunk.id,
-					vertexCount: chunkMesh.vertexCount
+					elements: chunkMesh.elements
 				});
 			});
 		})
@@ -130,7 +130,7 @@ const octreeGrid = {
 
 						meshes[map3D1D(id)] = {
 							id,
-							mesh: null
+							data: null
 						}
 					}
 
