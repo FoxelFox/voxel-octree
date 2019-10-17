@@ -1,0 +1,107 @@
+import {Shader, SimpleNode, ArrayBufferNative, FrameBuffer, Texture, ArrayBuffer, Quad} from "@foxel_fox/glib";
+import {canvas, gl} from "../../context";
+import {mat4} from "gl-matrix";
+import {Camera} from "../../camera";
+import {OctreeGrid} from "../../../octree/grid";
+import {map3D1D} from "../../../octree/util";
+import {Chunk, VoxelsOnGPU} from "../../../octree/chunk";
+import {Transfer} from "threads/worker";
+
+
+interface Model {
+	vao: WebGLVertexArrayObject
+	position: ArrayBufferNative
+	matrix: mat4
+	vertexCount: number
+}
+
+export class RTChunkNode extends SimpleNode {
+
+	chunks: Texture;
+	uploadQueue = [];
+	frame = 0;
+	constructor (
+		private camera: Camera,
+		private grid: OctreeGrid
+	) {
+		super(new Shader(
+			require("./rt-chunk-node.vs.glsl"),
+			require("./rt-chunk-node.fs.glsl")
+		), new Quad() as {});
+
+	}
+
+	init(): void {
+		const output = new Texture();
+		this.chunks = new Texture(1024, 1024, undefined, gl.RGBA32F, gl.RGBA, gl.FLOAT);
+
+		this.frameBuffer = new FrameBuffer([output], false, true);
+		this.grid.getNext().then(n => {
+			if (n) {
+				this.uploadQueue.push(n);
+			}
+		})
+	}
+
+	run() {
+		this.render();
+	}
+
+	upload() {
+		if (this.uploadQueue[0]) {
+			const chunk = this.uploadQueue.shift();
+			const chunkID = map3D1D(chunk.id);
+
+			this.chunks.update(new Float32Array(chunk.data));
+
+			this.grid.meshUploaded(chunkID)
+		}
+		this.grid.getNext().then(n => {
+			if (n) {
+				this.uploadQueue.push(n);
+			}
+		})
+	}
+
+	render() {
+		this.upload();
+		this.frameBuffer.bind();
+
+		gl.enable(gl.DEPTH_TEST);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+		gl.useProgram(this.shader.program);
+		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+
+		let mvp = mat4.create();
+		let modelMatrix = mat4.create();
+		mat4.fromTranslation(modelMatrix, [0 , 1, 0]);
+
+		mat4.identity(mvp);
+		mat4.mul(mvp, this.camera.view, modelMatrix);
+		mat4.mul(mvp, this.camera.perspective, mvp);
+		mat4.invert(mvp, mvp);
+		gl.uniformMatrix4fv(this.shader.getUniformLocation("inverseMVP"), false, mvp);
+		gl.uniform3fv(this.shader.getUniformLocation("cameraPosition"), this.camera.position);
+		gl.uniform3fv(this.shader.getUniformLocation("cameraRotation"), [0, this.camera.rotY, this.camera.rotX ]);
+		gl.uniform2fv(this.shader.getUniformLocation("iResolution"), [canvas.width, canvas.height]);
+		gl.uniform1f(this.shader.getUniformLocation("iTime"), Date.now());
+		gl.uniform2fv(this.shader.getUniformLocation("iMouse"), [Math.floor(Math.abs(this.camera.rotX)) * 10, Math.floor(Math.abs(this.camera.rotY)) * 10]);
+
+		gl.uniform1ui(this.shader.getUniformLocation("iFrame"), this.frame);
+		this.frame++;
+
+
+
+		gl.uniform1i(this.shader.getUniformLocation("chunks"), 0);
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, this.chunks.webGLTexture);
+
+		gl.bindVertexArray(this.vao);
+		gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+
+
+	}
+}

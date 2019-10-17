@@ -115,7 +115,7 @@ export class Camera {
 		this.lastUpdateTime = now;
 
 		const ar = canvas.width / canvas.height;
-		mat4.perspective(this.perspective, 1.5, ar, 0.0001, 128);
+		mat4.perspective(this.perspective, 1.5, ar, 0.01, 100);
 
 		let inverseRotation = mat4.create();
 		mat4.invert(inverseRotation,this.matRotation);
