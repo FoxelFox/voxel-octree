@@ -3,10 +3,11 @@ import {Camera} from "./camera";
 import {OctreeGrid} from "../octree/grid";
 import {EditNode} from "./node/edit/edit-node";
 import {RTChunkNode} from "./node/rt-chunk-node/rt-chunk-node";
+import {ChunkNode} from "./node/chunk-node/chunk-node";
 
 export class Pipeline {
 
-	chunkNode: RTChunkNode;
+	chunkNode: ChunkNode;
 	output: OutputNode;
 	edit: EditNode;
 
@@ -17,13 +18,18 @@ export class Pipeline {
 	constructor(public grid: OctreeGrid) {
 		this.camera = new Camera();
 
-		this.chunkNode = new RTChunkNode(this.camera, grid);
+		this.chunkNode = new ChunkNode(this.camera, grid);
 		this.chunkNode.init();
 
 		this.edit = new EditNode(undefined, this.camera, grid);
 		this.edit.init();
 
-		this.output = new OutputNode(this.chunkNode.frameBuffer.textures[0]);
+		this.output = new OutputNode(
+			this.chunkNode.frameBuffer.textures[0],
+			this.chunkNode.frameBuffer.textures[1],
+			this.chunkNode.frameBuffer.textures[2],
+			this.camera
+		);
 		this.output.init();
 
 		document.addEventListener("keydown", async (element) => {
@@ -53,7 +59,7 @@ export class Pipeline {
 		this.camera.update();
 
 		this.chunkNode.run();
-		//this.edit.run();
+		this.edit.run();
 		this.output.run();
 
 		if (this.placeVoxel) {

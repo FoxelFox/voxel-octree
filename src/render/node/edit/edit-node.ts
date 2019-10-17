@@ -47,8 +47,8 @@ export class EditNode extends SimpleNode {
 				this.size /= 2;
 			}
 
-			if (this.size > 1024) {
-				this.size = 1024;
+			if (this.size > 512) {
+				this.size = 512;
 			}
 
 			if (this.size < 1) {
@@ -68,7 +68,7 @@ export class EditNode extends SimpleNode {
 
 
 				switch (e.button) {
-					case 0:
+					case 2:
 						this.grid.modify([
 							start[0] + this.size * this.readPixelNormal[0] * -1,
 							start[1] + this.size * this.readPixelNormal[1] * -1,
@@ -81,7 +81,7 @@ export class EditNode extends SimpleNode {
 
 						break;
 
-					case 2:
+					case 0:
 						this.grid.modify(start, end, 1);
 						break;
 				}

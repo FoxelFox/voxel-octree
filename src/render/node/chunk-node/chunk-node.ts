@@ -77,11 +77,16 @@ export class ChunkNode {
 			const chunk = this.uploadQueue.shift();
 			const chunkID = map3D1D(chunk.id);
 
-			if (!this.models[chunkID]) {
+			if (!this.models[chunkID] && chunk.elements) {
 				this.models[chunkID] = this.createMeshGPU(chunk);
 			} else {
-				this.models[chunkID].position.updateBuffer(chunk.data, 4 * chunk.elements * 2);
-				this.models[chunkID].vertexCount = chunk.elements;
+				if (chunk.elements) {
+					this.models[chunkID].position.updateBuffer(chunk.data, 4 * chunk.elements * 2);
+				}
+
+				if (this.models[chunkID]) {
+					this.models[chunkID].vertexCount = chunk.elements;
+				}
 			}
 			this.grid.meshUploaded(chunkID)
 		}
@@ -109,16 +114,16 @@ export class ChunkNode {
 		for (const key in this.models) {
 			model = this.models[key];
 
-			mat4.identity(mvp);
-			mat4.mul(mvp, this.camera.view, model.matrix);
-			mat4.mul(mvp, this.camera.perspective, mvp);
-			gl.uniformMatrix4fv(this.shader.getUniformLocation("mvp"), false, mvp);
-			gl.uniform3fv(this.shader.getUniformLocation("offset"), [model.matrix[12], model.matrix[13], model.matrix[14]])
+			if (model.vertexCount) {
+				mat4.identity(mvp);
+				mat4.mul(mvp, this.camera.view, model.matrix);
+				mat4.mul(mvp, this.camera.perspective, mvp);
+				gl.uniformMatrix4fv(this.shader.getUniformLocation("mvp"), false, mvp);
+				gl.uniform3fv(this.shader.getUniformLocation("offset"), [model.matrix[12], model.matrix[13], model.matrix[14]])
 
-			gl.bindVertexArray(model.vao);
-			gl.drawArrays(gl.TRIANGLES, 0, model.vertexCount);
+				gl.bindVertexArray(model.vao);
+				gl.drawArrays(gl.TRIANGLES, 0, model.vertexCount);
+			}
 		}
-
-
 	}
 }

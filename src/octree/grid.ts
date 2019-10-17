@@ -52,7 +52,7 @@ function balanceWork() {
 
 		lockedBuffer[chunkID] = true;
 		pool.queue(async worker => {
-			worker.work(JSON.stringify(chunk), chunkMesh.data ? chunkMesh.data : undefined).then((mesh) => {
+			worker.work(chunk.id, JSON.stringify(chunks), chunkMesh.data ? chunkMesh.data : undefined).then((mesh) => {
 				if (!chunkMesh.data) {
 					chunkMesh.data = mesh.data;
 				}
@@ -72,7 +72,7 @@ const octreeGrid = {
 
 	async initThreads() {
 		const maxWorkerThreads = Math.max(1, navigator.hardwareConcurrency -2);
-		pool = Pool(() => spawn<MeshGeneratorWorker>(new Worker("./worker/block-generator")), maxWorkerThreads)
+		pool = Pool(() => spawn<MeshGeneratorWorker>(new Worker("./worker/mesh-generator")), maxWorkerThreads)
 	},
 
 	meshChanges() {
