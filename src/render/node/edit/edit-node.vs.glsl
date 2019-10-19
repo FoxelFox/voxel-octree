@@ -7,6 +7,6 @@ out vec4 v_color;
 
 void main() {
     gl_Position = mvp * position;
-    gl_Position.z = gl_Position.z -0.000001;
+    gl_Position.z = gl_Position.z -0.0001;
     v_color = vec4(1.0);
 }

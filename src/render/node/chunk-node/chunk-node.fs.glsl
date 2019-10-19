@@ -23,7 +23,7 @@ void main() {
 //    vec3 wireColor = v_normal + 0.75;
 //    f_color.rgb = mix(wireColor , v_normal * 0.5 + 0.5, edgeFactor());
 
-    f_color = vec4(1.0);
+    f_color = v_color;
     f_normal = v_normal;
     f_position = v_position;
 }

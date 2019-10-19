@@ -17,8 +17,7 @@ void main() {
     gl_PointSize = 1.0;
     gl_Position = mvp * position;
 
-    v_color.rgb = position.rgb;
-    v_color.w = length(gl_Position.xyz);
+    v_color = vec4(1);
 
     v_normal = normal;
     v_position = position.xyz + offset;

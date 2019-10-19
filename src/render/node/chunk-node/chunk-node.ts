@@ -34,8 +34,8 @@ export class ChunkNode {
 
 	init(): void {
 		const output = new Texture();
-		const normal = new Texture(undefined, undefined, null, gl.RGBA32F, gl.RGBA, gl.FLOAT);
-		const position = new Texture(undefined, undefined, null, gl.RGBA32F, gl.RGBA, gl.FLOAT);
+		const normal = new Texture(undefined, undefined, null, gl.RGBA16F, gl.RGBA, gl.FLOAT);
+		const position = new Texture(undefined, undefined, null, gl.RGBA16F, gl.RGBA, gl.FLOAT);
 
 		this.frameBuffer = new FrameBuffer([output, normal, position], false, true);
 		this.grid.getNext().then(n => {

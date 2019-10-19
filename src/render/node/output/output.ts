@@ -4,6 +4,7 @@ import {Quad} from "@foxel_fox/glib";
 import {canvas, gl} from "../../context";
 import {Texture} from "@foxel_fox/glib";
 import {Camera} from "../../camera";
+import {mat4} from "gl-matrix";
 
 export class OutputNode extends SimpleNode {
 
@@ -48,6 +49,16 @@ export class OutputNode extends SimpleNode {
 
         gl.uniform3fv(this.shader.getUniformLocation("cameraPosition"), this.camera.position);
         gl.uniform3fv(this.shader.getUniformLocation("cameraRotation"), [this.camera.rotX, this.camera.rotY, 0 ]);
+
+        let mvp = mat4.create();
+        let modelMatrix = mat4.create();
+
+        mat4.identity(mvp);
+        mat4.mul(mvp, this.camera.view, modelMatrix);
+        mat4.mul(mvp, this.camera.perspective, mvp);
+        mat4.invert(mvp, mvp);
+        gl.uniformMatrix4fv(this.shader.getUniformLocation("inverseMVP"), false, mvp);
+
 
 
         gl.bindVertexArray(this.vao);
