@@ -52,15 +52,17 @@ function balanceWork() {
 
 		lockedBuffer[chunkID] = true;
 		pool.queue(async worker => {
-			worker.work(chunk.id, JSON.stringify(chunks), chunkMesh.data ? chunkMesh.data : undefined).then((mesh) => {
-				if (!chunkMesh.data) {
-					chunkMesh.data = mesh.data;
+			worker.work(chunk.id, JSON.stringify(chunks), chunkMesh.v ? chunkMesh.v : undefined, chunkMesh.v ? chunkMesh.rt : undefined).then((mesh) => {
+				if (!chunkMesh.v) {
+					chunkMesh.v = mesh.v;
+					chunkMesh.rt = mesh.rt;
 				}
-				chunkMesh.elements = mesh.elements;
+				chunkMesh.index = mesh.index;
 				results.push({
-					data: mesh.data,
+					v: mesh.v,
+					rt: mesh.rt,
 					id: chunk.id,
-					elements: chunkMesh.elements
+					index: chunkMesh.index
 				});
 			});
 		})
@@ -130,7 +132,8 @@ const octreeGrid = {
 
 						meshes[map3D1D(id)] = {
 							id,
-							data: null
+							v: null,
+							rt: null
 						}
 					}
 

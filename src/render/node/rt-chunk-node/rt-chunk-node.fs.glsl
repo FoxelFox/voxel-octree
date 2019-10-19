@@ -155,7 +155,7 @@ vec3 getSkyColor( vec3 rd ) {
 //    vec3 col = mix(vec3(1),vec3(.5,.7,1), .5+.5*rd.y);
 //    float sun = clamp(dot(normalize(vec3(-.4,.7,-.6)),rd), 0., 1.);
 //    col += vec3(1,.6,.1)*(pow(sun,4.) + 10.*pow(sun,32.));
-    return rd;
+    return vec3(max(dot(rd, vec3(0,0,1)), 0.25));
 }
 
 

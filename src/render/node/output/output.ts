@@ -12,7 +12,8 @@ export class OutputNode extends SimpleNode {
         private diffuse: Texture,
         private normal: Texture,
         private position: Texture,
-        private camera: Camera
+        private camera: Camera,
+        private chunks: Texture
     ) {
         super(new Shader(require("./output.vs.glsl"), require("./output.fs.glsl")), new Quad() as {});
     }
@@ -46,6 +47,10 @@ export class OutputNode extends SimpleNode {
         gl.activeTexture(gl.TEXTURE2);
         gl.uniform1i(this.shader.getUniformLocation("tPosition"), 2);
         gl.bindTexture(gl.TEXTURE_2D, this.position.webGLTexture);
+
+        gl.activeTexture(gl.TEXTURE3);
+        gl.uniform1i(this.shader.getUniformLocation("tChunks"), 3);
+        gl.bindTexture(gl.TEXTURE_2D, this.chunks.webGLTexture);
 
         gl.uniform3fv(this.shader.getUniformLocation("cameraPosition"), this.camera.position);
         gl.uniform3fv(this.shader.getUniformLocation("cameraRotation"), [this.camera.rotX, this.camera.rotY, 0 ]);

@@ -21,6 +21,7 @@ export class ChunkNode {
 	frameBuffer!: FrameBuffer;
 	models: { [key: number]: Model } = {};
 	uploadQueue = [];
+	chunks: Texture;
 
 	constructor (
 		private camera: Camera,
@@ -36,6 +37,7 @@ export class ChunkNode {
 		const output = new Texture();
 		const normal = new Texture(undefined, undefined, null, gl.RGBA16F, gl.RGBA, gl.FLOAT);
 		const position = new Texture(undefined, undefined, null, gl.RGBA16F, gl.RGBA, gl.FLOAT);
+		this.chunks = new Texture(4096, 1, undefined, gl.RGBA32F, gl.RGBA, gl.FLOAT);
 
 		this.frameBuffer = new FrameBuffer([output, normal, position], false, true);
 		this.grid.getNext().then(n => {
@@ -51,7 +53,7 @@ export class ChunkNode {
 
 	createMeshGPU(chunk: VoxelsOnGPU): Model {
 		const vao = gl.createVertexArray() as WebGLVertexArrayObject;
-		const position = new ArrayBufferNative(chunk.data, 4 * chunk.elements * 2, 3, gl.FLOAT);
+		const position = new ArrayBufferNative(chunk.v, 4 * chunk.index.v * 2, 3, gl.FLOAT);
 		const positionAttribute = this.shader.getAttributeLocation("position");
 		const normalAttribute = this.shader.getAttributeLocation("normal");
 		const matrix = mat4.create();
@@ -69,7 +71,7 @@ export class ChunkNode {
 
 		mat4.fromTranslation(matrix, chunk.id);
 
-		return { vao, position, matrix, vertexCount: chunk.elements };
+		return { vao, position, matrix, vertexCount: chunk.index.v };
 	}
 
 	upload() {
@@ -77,15 +79,17 @@ export class ChunkNode {
 			const chunk = this.uploadQueue.shift();
 			const chunkID = map3D1D(chunk.id);
 
-			if (!this.models[chunkID] && chunk.elements) {
+			if (!this.models[chunkID] && chunk.index && chunk.index.v) {
 				this.models[chunkID] = this.createMeshGPU(chunk);
+				this.chunks.update(new Float32Array(chunk.rt));
 			} else {
-				if (chunk.elements) {
-					this.models[chunkID].position.updateBuffer(chunk.data, 4 * chunk.elements * 2);
+				if (chunk.index && chunk.index.v) {
+					this.models[chunkID].position.updateBuffer(chunk.v, 4 * chunk.index.v * 2);
+					this.chunks.update(new Float32Array(chunk.rt));
 				}
 
 				if (this.models[chunkID]) {
-					this.models[chunkID].vertexCount = chunk.elements;
+					this.models[chunkID].vertexCount = chunk.index.v;
 				}
 			}
 			this.grid.meshUploaded(chunkID)

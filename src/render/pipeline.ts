@@ -28,7 +28,8 @@ export class Pipeline {
 			this.chunkNode.frameBuffer.textures[0],
 			this.chunkNode.frameBuffer.textures[1],
 			this.chunkNode.frameBuffer.textures[2],
-			this.camera
+			this.camera,
+			this.chunkNode.chunks,
 		);
 		this.output.init();
 
@@ -51,8 +52,8 @@ export class Pipeline {
 			}
 		});
 
-		grid.modify([0, 1024, 0], [1023, 2047, 1023], 1);
-		grid.modify([256, 1024, 256], [767, 2047, 767], 0);
+		grid.modify([0, 0, 0], [1023, 1023, 1023], 1);
+		grid.modify([256, 0, 256], [767, 1023, 767], 0);
 	}
 
 	run() {

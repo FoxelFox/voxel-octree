@@ -29,7 +29,7 @@ void main() {
     // No need to normalize ray direction here, as it might get
     // interpolated (and become non-unit) before going to the fragment
     // shader.
-    rayDirection = (farPlane.xyz - nearPlane.xyz);
+    rayDirection = normalize(farPlane.xyz - nearPlane.xyz);
     rayOrigin = nearPlane.xyz;
 
 }

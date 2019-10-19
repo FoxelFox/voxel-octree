@@ -7,6 +7,7 @@ export interface Chunk {
 
 export interface VoxelsOnGPU {
 	id: number[]
-	data?: any
-	elements?: number
+	v?: any
+	rt?: any
+	index?: { v: number, rt: number }
 }

@@ -33,7 +33,7 @@ export class RTChunkNode extends SimpleNode {
 
 	init(): void {
 		const output = new Texture();
-		this.chunks = new Texture(1024, 1024, undefined, gl.RGBA32F, gl.RGBA, gl.FLOAT);
+		this.chunks = new Texture(4096, 1, undefined, gl.RGBA32F, gl.RGBA, gl.FLOAT);
 
 		this.frameBuffer = new FrameBuffer([output], false, true);
 		this.grid.getNext().then(n => {
@@ -52,7 +52,7 @@ export class RTChunkNode extends SimpleNode {
 			const chunk = this.uploadQueue.shift();
 			const chunkID = map3D1D(chunk.id);
 
-			this.chunks.update(new Float32Array(chunk.data));
+			this.chunks.update(new Float32Array(chunk.rt));
 
 			this.grid.meshUploaded(chunkID)
 		}
@@ -65,7 +65,7 @@ export class RTChunkNode extends SimpleNode {
 
 	render() {
 		this.upload();
-		this.frameBuffer.bind();
+		//this.frameBuffer.bind();
 
 		gl.enable(gl.DEPTH_TEST);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -76,7 +76,7 @@ export class RTChunkNode extends SimpleNode {
 
 		let mvp = mat4.create();
 		let modelMatrix = mat4.create();
-		mat4.fromTranslation(modelMatrix, [0 , 1, 0]);
+		mat4.fromTranslation(modelMatrix, [0 , 0, 0]);
 
 		mat4.identity(mvp);
 		mat4.mul(mvp, this.camera.view, modelMatrix);
