@@ -1,14 +1,16 @@
-import {OutputNode} from "./node/output/output";
+import {RTLightNode} from "./node/rt-light/rt-light";
 import {Camera} from "./camera";
 import {OctreeGrid} from "../octree/grid";
 import {EditNode} from "./node/edit/edit-node";
 import {RTChunkNode} from "./node/rt-chunk-node/rt-chunk-node";
 import {ChunkNode} from "./node/chunk-node/chunk-node";
+import {RTGINode} from "./node/rt-gi/rt-gi";
 
 export class Pipeline {
 
 	chunkNode: ChunkNode;
-	output: OutputNode;
+	rtLightNode: RTLightNode;
+	rtGINode: RTGINode;
 	edit: EditNode;
 
 	camera: Camera;
@@ -24,14 +26,18 @@ export class Pipeline {
 		this.edit = new EditNode(undefined, this.camera, grid);
 		this.edit.init();
 
-		this.output = new OutputNode(
+		this.rtLightNode = new RTLightNode(
 			this.chunkNode.frameBuffer.textures[0],
 			this.chunkNode.frameBuffer.textures[1],
 			this.chunkNode.frameBuffer.textures[2],
 			this.camera,
 			this.chunkNode.chunks,
+			this.chunkNode
 		);
-		this.output.init();
+		this.rtLightNode.init();
+
+		this.rtGINode = new RTGINode(this.chunkNode, this.rtLightNode);
+		this.rtGINode.init();
 
 		document.addEventListener("keydown", async (element) => {
 			switch (element.key) {
@@ -61,7 +67,8 @@ export class Pipeline {
 
 		this.chunkNode.run();
 		this.edit.run();
-		this.output.run();
+		this.rtLightNode.run();
+		this.rtGINode.run();
 
 		if (this.placeVoxel) {
 			const p = this.camera.position;

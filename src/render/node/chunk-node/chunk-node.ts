@@ -22,6 +22,7 @@ export class ChunkNode {
 	models: { [key: number]: Model } = {};
 	uploadQueue = [];
 	chunks: Texture;
+	chunkRTBlocks: number = 0;
 
 	constructor (
 		private camera: Camera,
@@ -36,7 +37,7 @@ export class ChunkNode {
 	init(): void {
 		const output = new Texture();
 		const normal = new Texture(undefined, undefined, null, gl.RGBA16F, gl.RGBA, gl.FLOAT);
-		const position = new Texture(undefined, undefined, null, gl.RGBA16F, gl.RGBA, gl.FLOAT);
+		const position = new Texture(undefined, undefined, null, gl.RGBA32F, gl.RGBA, gl.FLOAT);
 		this.chunks = new Texture(4096, 1, undefined, gl.RGBA32F, gl.RGBA, gl.FLOAT);
 
 		this.frameBuffer = new FrameBuffer([output, normal, position], false, true);
@@ -82,14 +83,17 @@ export class ChunkNode {
 			if (!this.models[chunkID] && chunk.index && chunk.index.v) {
 				this.models[chunkID] = this.createMeshGPU(chunk);
 				this.chunks.update(new Float32Array(chunk.rt));
+				this.chunkRTBlocks = chunk.index.rt;
 			} else {
 				if (chunk.index && chunk.index.v) {
 					this.models[chunkID].position.updateBuffer(chunk.v, 4 * chunk.index.v * 2);
 					this.chunks.update(new Float32Array(chunk.rt));
+					this.chunkRTBlocks = chunk.index.rt;
 				}
 
 				if (this.models[chunkID]) {
 					this.models[chunkID].vertexCount = chunk.index.v;
+					this.chunkRTBlocks = chunk.index.rt;
 				}
 			}
 			this.grid.meshUploaded(chunkID)

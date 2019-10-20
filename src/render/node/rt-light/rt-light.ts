@@ -1,37 +1,40 @@
-import {SimpleNode} from "@foxel_fox/glib"
+import {FrameBuffer, SimpleNode} from "@foxel_fox/glib"
 import {Shader} from "@foxel_fox/glib";
 import {Quad} from "@foxel_fox/glib";
 import {canvas, gl} from "../../context";
 import {Texture} from "@foxel_fox/glib";
 import {Camera} from "../../camera";
 import {mat4} from "gl-matrix";
+import {ChunkNode} from "../chunk-node/chunk-node";
 
-export class OutputNode extends SimpleNode {
+export class RTLightNode extends SimpleNode {
+
+    size = undefined;
 
     constructor(
         private diffuse: Texture,
         private normal: Texture,
         private position: Texture,
         private camera: Camera,
-        private chunks: Texture
+        private chunks: Texture,
+        private chunkNode: ChunkNode,
     ) {
-        super(new Shader(require("./output.vs.glsl"), require("./output.fs.glsl")), new Quad() as {});
+        super(new Shader(require("./rt-light.vs.glsl"), require("./rt-light.fs.glsl")), new Quad() as {});
     }
 
     init() {
 
-        // texture
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, this.diffuse.webGLTexture);
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        const output = new Texture(this.size, this.size);
+        const normal = new Texture(this.size, this.size, null, gl.RGBA16F, gl.RGBA, gl.FLOAT);
+        const position = new Texture(this.size, this.size, null, gl.RGBA32F, gl.RGBA, gl.FLOAT);
+
+        this.frameBuffer = new FrameBuffer([output, normal, position], false, false);
+
     }
 
     run() {
-
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        this.frameBuffer.bind();
         gl.viewport(0, 0, canvas.width, canvas.height);
-
 
         gl.useProgram(this.shader.program);
 
@@ -54,6 +57,8 @@ export class OutputNode extends SimpleNode {
 
         gl.uniform3fv(this.shader.getUniformLocation("cameraPosition"), this.camera.position);
         gl.uniform3fv(this.shader.getUniformLocation("cameraRotation"), [this.camera.rotX, this.camera.rotY, 0 ]);
+
+        gl.uniform1i(this.shader.getUniformLocation("rtBlocks"), this.chunkNode.chunkRTBlocks);
 
         let mvp = mat4.create();
         let modelMatrix = mat4.create();

@@ -132,8 +132,6 @@ export class EditNode extends SimpleNode {
 			this.readPixelPosition[2] - this.scale * this.readPixelNormal[2]
 		]);
 
-
-
 		mat4.scale(matrix, matrix, [this.scale, this.scale, this.scale]);
 
 		let mvp = mat4.create();
@@ -142,8 +140,6 @@ export class EditNode extends SimpleNode {
 		mat4.mul(mvp, this.camera.view, matrix);
 		mat4.mul(mvp, this.camera.perspective, mvp);
 		gl.uniformMatrix4fv(this.shader.getUniformLocation("mvp"), false, mvp);
-
-
 
 		gl.useProgram(this.shader.program);
 		gl.bindVertexArray(this.vao);

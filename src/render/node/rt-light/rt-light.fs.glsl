@@ -1,5 +1,5 @@
 #version 300 es
-precision mediump float;
+precision highp float;
 
 uniform sampler2D tDiffuse;
 uniform sampler2D tNormal;
@@ -7,12 +7,15 @@ uniform sampler2D tPosition;
 uniform sampler2D tChunks;
 uniform vec3 cameraPosition;
 uniform vec3 cameraRotation;
+uniform int rtBlocks;
 
 in vec2 v_texCoord;
 in vec3 rayDirection;
 in vec3 rayOrigin;
 
-out vec4 outColor;
+layout(location = 0) out vec4 f_color;
+layout(location = 1) out vec4 f_normal;
+layout(location = 2) out vec4 f_position;
 
 #define MAX_DIST 1e10
 
@@ -42,6 +45,23 @@ float iBox( in vec3 ro, in vec3 rd, in vec2 distBound, inout vec3 normal, in vec
     }
 }
 
+float rand(float n){return fract(sin(n) * 43758.5453123);}
+float rand(vec2 n) {
+    return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
+}
+
+float noise(float p){
+    float fl = floor(p);
+    float fc = fract(p);
+    return mix(rand(fl), rand(fl + 1.0), fc);
+}
+
+float noise(vec2 n) {
+    const vec2 d = vec2(0.0, 1.0);
+    vec2 b = floor(n), f = smoothstep(vec2(0.0), vec2(1.0), fract(n));
+    return mix(mix(rand(b), rand(b + d.yx), f.x), mix(rand(b + d.xy), rand(b + d.yy), f.x), f.y);
+}
+
 void main() {
 
     vec4 d = texture(tDiffuse, v_texCoord);
@@ -54,7 +74,9 @@ void main() {
     vec3 sun2 = normalize(vec3(-0.5, 0.75, -1.0));
 
     if (length(n.xyz) < 0.1 || length(n.xyz) > 1.1) {
-        outColor = d;
+        f_color = d;
+        f_normal = n;
+        f_position = p;
     } else {
         vec4 block;
         float rt = MAX_DIST;
@@ -68,40 +90,29 @@ void main() {
         vec3 normal = vec3(0);
         vec2 dist = vec2(.0001, 100);
 
-        for (int x = 0; x < 4096; ++x) {
+        for (int x = 0; x < rtBlocks; ++x) {
             block = texelFetch(tChunks, ivec2(x, 0), 0);
             if (block.w == 0.0) {
                 break;
             }
 
 
-            //rt = min(iBox(p.xyz - block.xyz, sun1, dist, normal, vec3(block.w)), rt);
             rt = min(iBox(p.xyz - block.xyz, sun1, dist, normal, vec3(block.w)), rt);
-//            rt0 = min(iBox(p.xyz - block.xyz , sun1 + vec3(0.5, 0.1, 0.1), dist, normal, vec3(block.w)), rt0);
-//            rt1 = min(iBox(p.xyz - block.xyz, sun1 + vec3(0.1, 0.5, 0.1), dist, normal, vec3(block.w)), rt1);
-//            rt2 = min(iBox(p.xyz - block.xyz, sun1 + vec3(0.5, 0.1, 0.5), dist, normal, vec3(block.w)), rt2);
-//
-//            rt3 = min(iBox(p.xyz - block.xyz, sun1 + vec3(-0.5, 0.1, 0.01), dist, normal, vec3(block.w)), rt3);
-//            rt4 = min(iBox(p.xyz - block.xyz, sun1 + vec3(0.1, -0.5, 0.1), dist, normal, vec3(block.w)), rt4);
-//            rt5 = min(iBox(p.xyz - block.xyz, sun1 + vec3(0.1, 0.1, -0.5), dist, normal, vec3(block.w)), rt5);
-
-
 
         }
 
 
 
-        if (rt > 100.0) {
-            vec4 sun1Light = max(dot(sun1, n.xyz), 0.0) * vec4(1.0, 0.95, 0.95, 1.0);
-            outColor = d * sun1Light;
-        } else {
-            outColor = d * 0.25;
-        }
-        //outColor = vec4(rt0 + rt1 +rt2 +rt3 +rt4 +rt5) / 6.0;
+
+        vec4 sun1Light = max(dot(sun1, n.xyz), 0.0) * vec4(1.0, 0.95, 0.95, 1.0);
+
+        sun1Light = rt > 1.0 ? vec4(1.0) : vec4(0.1);
+        //rt0 = rt0 > 1.0 ? min(rt0, 1.0) : 0.25;
 
 
-        //outColor = vec4(distance * dot(n.xyz, -rayDirection));
-        //outColor = vec4(p);
+
+        f_color = d * sun1Light;
+        f_normal.xyz = rayDirection;
+        f_position = p;
     }
-
 }
