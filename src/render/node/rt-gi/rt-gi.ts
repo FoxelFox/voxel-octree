@@ -26,7 +26,6 @@ export class RTGINode extends SimpleNode {
 		gl.uniform1i(this.shader.getUniformLocation("tDiffuse"), 0);
 		gl.bindTexture(gl.TEXTURE_2D, this.chunkNode.frameBuffer.textures[0].webGLTexture);
 
-
 		gl.activeTexture(gl.TEXTURE1);
 		gl.uniform1i(this.shader.getUniformLocation("tNormal"), 1);
 		gl.bindTexture(gl.TEXTURE_2D, this.chunkNode.frameBuffer.textures[1].webGLTexture);
@@ -46,6 +45,13 @@ export class RTGINode extends SimpleNode {
 		gl.activeTexture(gl.TEXTURE5);
 		gl.uniform1i(this.shader.getUniformLocation("tRTPosition"), 5);
 		gl.bindTexture(gl.TEXTURE_2D, this.rtLightNode.frameBuffer.textures[2].webGLTexture);
+
+		gl.activeTexture(gl.TEXTURE6);
+		gl.uniform1i(this.shader.getUniformLocation("tChunks"), 6);
+		gl.bindTexture(gl.TEXTURE_2D, this.chunkNode.chunks.webGLTexture);
+
+		gl.uniform2f(this.shader.getUniformLocation("sampleSize"), 1 / canvas.width, 1 / canvas.height);
+		gl.uniform1i(this.shader.getUniformLocation("rtBlocks"), this.chunkNode.chunkRTBlocks);
 
 		gl.bindVertexArray(this.vao);
 		gl.drawArrays(gl.TRIANGLES, 0, 6);

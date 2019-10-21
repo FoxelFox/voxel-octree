@@ -35,6 +35,7 @@ export class RTLightNode extends SimpleNode {
     run() {
         this.frameBuffer.bind();
         gl.viewport(0, 0, canvas.width, canvas.height);
+        //gl.viewport(0, 0, this.size, this.size);
 
         gl.useProgram(this.shader.program);
 
