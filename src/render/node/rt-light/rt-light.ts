@@ -10,6 +10,7 @@ import {ChunkNode} from "../chunk-node/chunk-node";
 export class RTLightNode extends SimpleNode {
 
     size = undefined;
+    frame = 1;
 
     constructor(
         private diffuse: Texture,
@@ -25,10 +26,8 @@ export class RTLightNode extends SimpleNode {
     init() {
 
         const output = new Texture(this.size, this.size);
-        const normal = new Texture(this.size, this.size, null, gl.RGBA16F, gl.RGBA, gl.FLOAT);
-        const position = new Texture(this.size, this.size, null, gl.RGBA32F, gl.RGBA, gl.FLOAT);
 
-        this.frameBuffer = new FrameBuffer([output, normal, position], false, false);
+        this.frameBuffer = new FrameBuffer([output], true, false);
 
     }
 
@@ -56,10 +55,17 @@ export class RTLightNode extends SimpleNode {
         gl.uniform1i(this.shader.getUniformLocation("tChunks"), 3);
         gl.bindTexture(gl.TEXTURE_2D, this.chunks.webGLTexture);
 
+        gl.activeTexture(gl.TEXTURE4);
+        gl.uniform1i(this.shader.getUniformLocation("tLastRT"), 4);
+        gl.bindTexture(gl.TEXTURE_2D, this.frameBuffer.textures[0].webGLTexture);
+
         gl.uniform3fv(this.shader.getUniformLocation("cameraPosition"), this.camera.position);
         gl.uniform3fv(this.shader.getUniformLocation("cameraRotation"), [this.camera.rotX, this.camera.rotY, 0 ]);
 
         gl.uniform1i(this.shader.getUniformLocation("rtBlocks"), this.chunkNode.chunkRTBlocks);
+        gl.uniform1f(this.shader.getUniformLocation("frame"), this.frame);
+        this.frame++;
+
 
         let mvp = mat4.create();
         let modelMatrix = mat4.create();
@@ -75,6 +81,6 @@ export class RTLightNode extends SimpleNode {
         gl.bindVertexArray(this.vao);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-
+        this.frameBuffer.flip();
     }
 }

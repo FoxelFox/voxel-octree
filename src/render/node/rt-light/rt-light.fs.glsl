@@ -5,19 +5,33 @@ uniform sampler2D tDiffuse;
 uniform sampler2D tNormal;
 uniform sampler2D tPosition;
 uniform sampler2D tChunks;
+uniform sampler2D tLastRT;
+
 uniform vec3 cameraPosition;
 uniform vec3 cameraRotation;
 uniform int rtBlocks;
+uniform float frame;
 
 in vec2 v_texCoord;
 in vec3 rayDirection;
 in vec3 rayOrigin;
 
 layout(location = 0) out vec4 f_color;
-layout(location = 1) out vec4 f_normal;
-layout(location = 2) out vec4 f_position;
 
 #define MAX_DIST 1e10
+
+uint baseHash( uvec2 p ) {
+    p = 1103515245U*((p >> 1U)^(p.yx));
+    uint h32 = 1103515245U*((p.x)^(p.y>>3U));
+    return h32^(h32 >> 16);
+}
+
+vec3 hash32(uvec2 x)
+{
+    uint n = baseHash(x);
+    uvec3 rz = uvec3(n, n*16807U, n*48271U);
+    return vec3((rz >> 1) & uvec3(0x7fffffffU))/float(0x7fffffff);
+}
 
 float iBox( in vec3 ro, in vec3 rd, in vec2 distBound, inout vec3 normal, in vec3 boxSize ) {
     vec3 m = sign(rd)/max(abs(rd), 1e-8);
@@ -67,6 +81,7 @@ void main() {
     vec4 d = texture(tDiffuse, v_texCoord);
     vec4 n = texture(tNormal, v_texCoord);
     vec4 p = texture(tPosition, v_texCoord);
+    vec4 l = texture(tLastRT, v_texCoord);
 
 
 
@@ -75,8 +90,6 @@ void main() {
 
     if (length(n.xyz) < 0.1 || length(n.xyz) > 1.1) {
         f_color = d;
-        f_normal = n;
-        f_position = p;
     } else {
         vec4 block;
         float rt = MAX_DIST;
@@ -88,31 +101,21 @@ void main() {
         float rt5 = MAX_DIST;
 
         vec3 normal = vec3(0);
-        vec2 dist = vec2(.0001, 100);
+        vec2 dist = vec2(.00000001, 1);
 
+
+        vec3 rand = hash32(uvec2(v_texCoord * 4096.0 * frame)) * 2.0 - 1.0;
         for (int x = 0; x < rtBlocks; ++x) {
             block = texelFetch(tChunks, ivec2(x, 0), 0);
             if (block.w == 0.0) {
                 break;
             }
-
-
-            rt = min(iBox(p.xyz - block.xyz, sun1, dist, normal, vec3(block.w)), rt);
+            rt = min(iBox(p.xyz - block.xyz, rand + n.xyz, dist, normal, vec3(block.w)), rt);
 
         }
 
+        f_color = rt > 1.0 ? vec4(1.0) : vec4(rt);
+        f_color = mix(f_color, l, 0.75);
 
-
-
-        vec4 sun1Light = max(dot(sun1, n.xyz), 0.0) * vec4(1.0, 0.95, 0.95, 1.0);
-
-        sun1Light = rt > 1.0 ? vec4(1.0) : vec4(0.1);
-        //rt0 = rt0 > 1.0 ? min(rt0, 1.0) : 0.25;
-
-
-
-        f_color = d * sun1Light;
-        f_normal.xyz = rayDirection;
-        f_position = p;
     }
 }

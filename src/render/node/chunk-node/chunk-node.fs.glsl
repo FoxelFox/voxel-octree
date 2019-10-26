@@ -6,6 +6,7 @@ in vec4 v_color;
 in vec3 v_normal;
 in vec3 v_position;
 in vec3 wire;
+
 layout(location = 0) out vec4 f_color;
 layout(location = 1) out vec3 f_normal;
 layout(location = 2) out vec3 f_position;

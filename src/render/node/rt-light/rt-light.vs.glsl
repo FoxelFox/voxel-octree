@@ -5,7 +5,6 @@ in vec2 a_texCoord;
 
 out vec3 rayDirection;
 out vec3 rayOrigin;
-
 out vec2 v_texCoord;
 
 
