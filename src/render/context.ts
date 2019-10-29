@@ -13,6 +13,7 @@ setContext(gl);
 gl.getExtension("EXT_color_buffer_float");
 gl.enable(gl.CULL_FACE);
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+gl.clearColor(1,1,1,1);
 //gl.cullFace(gl.FRONT_FACE);
 
 

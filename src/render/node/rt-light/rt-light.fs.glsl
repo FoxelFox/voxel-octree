@@ -11,6 +11,8 @@ uniform vec3 cameraPosition;
 uniform vec3 cameraRotation;
 uniform int rtBlocks;
 uniform float frame;
+uniform vec2 sampleSize;
+uniform mat4 oldMVP;
 
 in vec2 v_texCoord;
 in vec3 rayDirection;
@@ -92,19 +94,27 @@ void main() {
         f_color = d;
     } else {
         vec4 block;
-        float rt = MAX_DIST;
-        float rt0 = MAX_DIST;
-        float rt1 = MAX_DIST;
-        float rt2 = MAX_DIST;
-        float rt3 = MAX_DIST;
-        float rt4 = MAX_DIST;
-        float rt5 = MAX_DIST;
+
 
         vec3 normal = vec3(0);
-        vec2 dist = vec2(.00000001, 1);
+        vec2 dist = vec2(.00000001, 10);
 
 
         vec3 rand = hash32(uvec2(v_texCoord * 4096.0 * frame)) * 2.0 - 1.0;
+
+        float rt = MAX_DIST;
+        for (int x = 0; x < rtBlocks; ++x) {
+            block = texelFetch(tChunks, ivec2(x, 0), 0);
+            if (block.w == 0.0) {
+                break;
+            }
+            rt = min(iBox(p.xyz - block.xyz, rand + sun1 * 16.0, dist, normal, vec3(block.w)), rt);
+
+        }
+
+        vec4 rtSun = rt > 1.0 ? vec4(1.0) : vec4(0.0);
+
+        rt = MAX_DIST;
         for (int x = 0; x < rtBlocks; ++x) {
             block = texelFetch(tChunks, ivec2(x, 0), 0);
             if (block.w == 0.0) {
@@ -113,9 +123,38 @@ void main() {
             rt = min(iBox(p.xyz - block.xyz, rand + n.xyz, dist, normal, vec3(block.w)), rt);
 
         }
+        vec4 rtAO = vec4(rt);
 
-        f_color = rt > 1.0 ? vec4(1.0) : vec4(rt);
-        f_color = mix(f_color, l, 0.75);
+        f_color = (rtAO + rtSun) / 2.0;
 
+
+
+        ///////////////////////////////////////////
+        // TAA
+        //////////////////////////////////////////
+
+        vec4 posOld = oldMVP * vec4(p.xyz, 1.0);
+        vec2 uvOld = (posOld.xy / posOld.w) * 0.5 + 0.5;
+
+
+        float blend = 0.95;
+
+        if (abs(uvOld.x) > 1.0 || abs(uvOld.y) > 1.0) {
+            blend = 0.0;
+        }
+
+
+        vec3 sum = vec3(0);
+        int samples = 0;
+        for (float x = -1.; x <= 1.; x+=1.) {
+            for (float y = -1.; y <= 1.; y+=1.) {
+                sum += texture(tLastRT, uvOld + vec2(x, y) * sampleSize).rgb;
+                samples++;
+            }
+        }
+
+
+
+        f_color.rgb = mix(f_color.rgb, sum / float(samples), blend);
     }
 }

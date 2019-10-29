@@ -43,6 +43,5 @@ void main() {
 
     vec3 rtC = texture(tRTLight, v_texCoord).rgb;
 
-
     outColor.rgb = d * rtC;
 }

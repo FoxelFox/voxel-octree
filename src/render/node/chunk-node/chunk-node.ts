@@ -23,6 +23,8 @@ export class ChunkNode {
 	uploadQueue = [];
 	chunks: Texture;
 	chunkRTBlocks: number = 0;
+	oldMVP: mat4;
+	currentMVP: mat4 = mat4.create();
 
 	constructor (
 		private camera: Camera,
@@ -117,7 +119,12 @@ export class ChunkNode {
 		let mvp = mat4.create();
 		let model: Model;
 
+		mat4.mul(mvp, this.camera.view, mat4.create());
+		mat4.mul(mvp, this.camera.perspective, mvp);
 
+		this.oldMVP = this.currentMVP;
+
+		this.currentMVP = mat4.clone(mvp);
 
 		for (const key in this.models) {
 			model = this.models[key];

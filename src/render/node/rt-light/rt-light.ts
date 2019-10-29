@@ -63,7 +63,10 @@ export class RTLightNode extends SimpleNode {
         gl.uniform3fv(this.shader.getUniformLocation("cameraRotation"), [this.camera.rotX, this.camera.rotY, 0 ]);
 
         gl.uniform1i(this.shader.getUniformLocation("rtBlocks"), this.chunkNode.chunkRTBlocks);
+        gl.uniform2f(this.shader.getUniformLocation("sampleSize"), 1 / canvas.width, 1 / canvas.height);
         gl.uniform1f(this.shader.getUniformLocation("frame"), this.frame);
+        gl.uniformMatrix4fv(this.shader.getUniformLocation("oldMVP"), false, this.chunkNode.oldMVP);
+
         this.frame++;
 
 
