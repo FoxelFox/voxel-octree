@@ -5,6 +5,7 @@ import {EditNode} from "./node/edit/edit-node";
 import {RTChunkNode} from "./node/rt-chunk-node/rt-chunk-node";
 import {ChunkNode} from "./node/chunk-node/chunk-node";
 import {RTGINode} from "./node/rt-gi/rt-gi";
+import {OutputNode} from "./node/output/output";
 
 export class Pipeline {
 
@@ -12,6 +13,7 @@ export class Pipeline {
 	rtLightNode: RTLightNode;
 	rtGINode: RTGINode;
 	edit: EditNode;
+	output: OutputNode;
 
 	camera: Camera;
 
@@ -38,6 +40,9 @@ export class Pipeline {
 
 		this.rtGINode = new RTGINode(this.chunkNode, this.rtLightNode);
 		this.rtGINode.init();
+
+		this.output = new OutputNode(this.rtGINode);
+		this.output.init();
 
 		document.addEventListener("keydown", async (element) => {
 			switch (element.key) {
@@ -69,6 +74,7 @@ export class Pipeline {
 		this.edit.run();
 		this.rtLightNode.run();
 		this.rtGINode.run();
+		this.output.run();
 
 		if (this.placeVoxel) {
 			const p = this.camera.position;

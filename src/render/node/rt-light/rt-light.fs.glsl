@@ -61,22 +61,8 @@ float iBox( in vec3 ro, in vec3 rd, in vec2 distBound, inout vec3 normal, in vec
     }
 }
 
-float rand(float n){return fract(sin(n) * 43758.5453123);}
-float rand(vec2 n) {
-    return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
-}
 
-float noise(float p){
-    float fl = floor(p);
-    float fc = fract(p);
-    return mix(rand(fl), rand(fl + 1.0), fc);
-}
 
-float noise(vec2 n) {
-    const vec2 d = vec2(0.0, 1.0);
-    vec2 b = floor(n), f = smoothstep(vec2(0.0), vec2(1.0), fract(n));
-    return mix(mix(rand(b), rand(b + d.yx), f.x), mix(rand(b + d.xy), rand(b + d.yy), f.x), f.y);
-}
 
 void main() {
 
@@ -123,38 +109,9 @@ void main() {
             rt = min(iBox(p.xyz - block.xyz, rand + n.xyz, dist, normal, vec3(block.w)), rt);
 
         }
-        vec4 rtAO = vec4(rt);
+        vec4 rtAO = vec4(clamp(rt, 0.0, 1.0));
 
-        f_color = (rtAO + rtSun) / 2.0;
+        f_color = d * (rtAO + rtSun) / 2.0;
 
-
-
-        ///////////////////////////////////////////
-        // TAA
-        //////////////////////////////////////////
-
-        vec4 posOld = oldMVP * vec4(p.xyz, 1.0);
-        vec2 uvOld = (posOld.xy / posOld.w) * 0.5 + 0.5;
-
-
-        float blend = 0.95;
-
-        if (abs(uvOld.x) > 1.0 || abs(uvOld.y) > 1.0) {
-            blend = 0.0;
-        }
-
-
-        vec3 sum = vec3(0);
-        int samples = 0;
-        for (float x = -1.; x <= 1.; x+=1.) {
-            for (float y = -1.; y <= 1.; y+=1.) {
-                sum += texture(tLastRT, uvOld + vec2(x, y) * sampleSize).rgb;
-                samples++;
-            }
-        }
-
-
-
-        f_color.rgb = mix(f_color.rgb, sum / float(samples), blend);
     }
 }
