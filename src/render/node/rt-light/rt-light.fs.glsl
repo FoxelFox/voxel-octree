@@ -21,6 +21,7 @@ in vec3 rayOrigin;
 layout(location = 0) out vec4 f_color;
 
 #define MAX_DIST 1e10
+#define SUN normalize(vec3(0.25, -0.125, 0.5))
 
 uint baseHash( uvec2 p ) {
     p = 1103515245U*((p >> 1U)^(p.yx));
@@ -61,6 +62,41 @@ float iBox( in vec3 ro, in vec3 rd, in vec2 distBound, inout vec3 normal, in vec
     }
 }
 
+vec3 sky(vec3 rd) {
+    float sun_amount = max(dot(rd, SUN), 0.0);
+    vec3 sun_color = vec3(1.0, .95, 0.9);
+
+    vec3  sky = mix(vec3(.4, .5, .6), vec3(.55, .65, .75), 1.0 - rd.y);
+    sky = sky + sun_color * min(pow(sun_amount, 1500.0) * 5.0, 1.0);
+    sky = sky + sun_color * min(pow(sun_amount, 10.0) * .6, 1.0);
+
+    return sky;
+}
+
+vec4 hit(in vec3 ro, in vec3 rd, inout vec3 normal) {
+    float rtMin = MAX_DIST;
+    vec4 blockMin = vec4(1);
+    vec3 normalMin = vec3(0);
+    float rt;
+    vec4 block;
+    vec2 dist = vec2(.00000001, 10);
+    for (int x = 0; x < rtBlocks; ++x) {
+        block = texelFetch(tChunks, ivec2(x, 0), 0);
+        if (block.w == 0.0) {
+            break;
+        }
+        rt = iBox(ro - block.xyz, rd, dist, normal, vec3(block.w));
+        if (rt < rtMin) {
+            rtMin = rt;
+            normalMin = normal;
+            blockMin = block;
+        }
+    }
+
+    normal = normalMin;
+    vec3 sun1 = normalize(vec3(0.5, -0.75, 1.0));
+    return rtMin > 1.0 ? vec4(sky(rd), 1.0) : vec4(0);
+}
 
 
 
@@ -77,41 +113,20 @@ void main() {
     vec3 sun2 = normalize(vec3(-0.5, 0.75, -1.0));
 
     if (length(n.xyz) < 0.1 || length(n.xyz) > 1.1) {
-        f_color = d;
+        f_color.xyz = sky(normalize(rayDirection));
     } else {
         vec4 block;
-
-
         vec3 normal = vec3(0);
         vec2 dist = vec2(.00000001, 10);
-
-
         vec3 rand = hash32(uvec2(v_texCoord * 4096.0 * frame)) * 2.0 - 1.0;
 
-        float rt = MAX_DIST;
-        for (int x = 0; x < rtBlocks; ++x) {
-            block = texelFetch(tChunks, ivec2(x, 0), 0);
-            if (block.w == 0.0) {
-                break;
-            }
-            rt = min(iBox(p.xyz - block.xyz, rand + sun1 * 16.0, dist, normal, vec3(block.w)), rt);
+        vec4 h = hit(p.xyz, rand + n.xyz, normal);
 
-        }
+        //vec4 rtSun = vec4(rt);
 
-        vec4 rtSun = rt > 1.0 ? vec4(1.0) : vec4(0.0);
 
-        rt = MAX_DIST;
-        for (int x = 0; x < rtBlocks; ++x) {
-            block = texelFetch(tChunks, ivec2(x, 0), 0);
-            if (block.w == 0.0) {
-                break;
-            }
-            rt = min(iBox(p.xyz - block.xyz, rand + n.xyz, dist, normal, vec3(block.w)), rt);
-
-        }
-        vec4 rtAO = vec4(clamp(rt, 0.0, 1.0));
-
-        f_color = d * (rtAO + rtSun) / 2.0;
+        f_color = h;
+        //f_color = d * rtAO;
 
     }
 }
