@@ -64,9 +64,9 @@ float iBox( in vec3 ro, in vec3 rd, in vec2 distBound, inout vec3 normal, in vec
 
 vec3 sky(vec3 rd) {
     float sun_amount = max(dot(rd, SUN), 0.0);
-    vec3 sun_color = vec3(1.0, .95, 0.9);
+    vec3 sun_color = vec3(0.6, .4, 0.2);
 
-    vec3  sky = mix(vec3(.4, .5, .6), vec3(.55, .65, .75), 1.0 - rd.y);
+    vec3  sky = mix(vec3(.5, .55, .6), vec3(.75, .7, .65), 1.0 + rd.z);
     sky = sky + sun_color * min(pow(sun_amount, 1500.0) * 5.0, 1.0);
     sky = sky + sun_color * min(pow(sun_amount, 10.0) * .6, 1.0);
 
@@ -120,12 +120,13 @@ void main() {
         vec2 dist = vec2(.00000001, 10);
         vec3 rand = hash32(uvec2(v_texCoord * 4096.0 * frame)) * 2.0 - 1.0;
 
-        vec4 h = hit(p.xyz, rand + n.xyz, normal);
+        vec4 h = hit(p.xyz, normalize(rand + n.xyz), normal);
+        vec4 sun = hit(p.xyz, normalize(rand + sun1 * 64.0), normal);
 
         //vec4 rtSun = vec4(rt);
 
 
-        f_color = h;
+        f_color = (h + sun) / 2.0;
         //f_color = d * rtAO;
 
     }
