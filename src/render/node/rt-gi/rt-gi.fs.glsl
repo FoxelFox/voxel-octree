@@ -70,4 +70,5 @@ void main() {
 
     vec3 clamped = clamp(rtL, mn, mx);
     outColor.rgb = mix(rtC, clamped, blend);
+    //outColor.rgb = rtC;
 }
