@@ -34,6 +34,7 @@ export class Pipeline {
 			this.chunkNode.frameBuffer.textures[2],
 			this.camera,
 			this.chunkNode.chunks,
+			this.chunkNode.colors,
 			this.chunkNode
 		);
 		this.rtLightNode.init();

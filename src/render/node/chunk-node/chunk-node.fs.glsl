@@ -21,8 +21,8 @@ float edgeFactor(){
 void main() {
 
     // wireframe
-    vec3 wireColor = v_normal + 0.75;
-    f_color.rgb = mix(wireColor , v_normal * 0.5 + 0.5, edgeFactor());
+    vec3 wireColor = v_color.rgb + 0.75;
+    f_color.rgb = mix(wireColor , v_color.rgb, edgeFactor());
 
 
 //    f_color.rgb = v_normal * 0.5 + 0.5;

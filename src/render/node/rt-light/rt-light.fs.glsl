@@ -1,10 +1,11 @@
 #version 300 es
-precision highp float;
+precision lowp float;
 
 uniform sampler2D tDiffuse;
 uniform sampler2D tNormal;
 uniform sampler2D tPosition;
 uniform sampler2D tChunks;
+uniform sampler2D tColors;
 uniform sampler2D tLastRT;
 
 uniform vec3 cameraPosition;
@@ -65,7 +66,7 @@ float iBox( in vec3 ro, in vec3 rd, in vec2 distBound, inout vec3 normal, in vec
 
 vec3 sky(vec3 rd) {
     float sun_amount = max(dot(rd, SUN), 0.0);
-    vec3 sun_color = vec3(0.6, .4, 0.1);
+    vec3 sun_color = vec3(0.6, .4, 0.2);
 
     vec3  sky = mix(vec3(.75, .73, .71), vec3(.5, .7, .9), 0.25 + rd.z);
     sky = sky + sun_color * min(pow(sun_amount, 1500.0) * 5.0, 1.0);
@@ -81,6 +82,7 @@ vec4 hit(in vec3 ro, in vec3 rd, inout vec3 normal) {
     float rt;
     vec4 block;
     vec2 dist = vec2(.00000001, 10);
+    int minIndex = -1;
 
     for (int x = 0; x < rtBlocks; ++x) {
         block = texelFetch(tChunks, ivec2(x, 0), 0);
@@ -92,11 +94,13 @@ vec4 hit(in vec3 ro, in vec3 rd, inout vec3 normal) {
             rtMin = rt;
             normalMin = normal;
             blockMin = block;
+            minIndex = x;
         }
     }
 
     normal = normalMin;
-    return vec4(1, 1, 1, rtMin);
+    vec4 blockColor = minIndex != -1 ? texelFetch(tColors, ivec2(minIndex, 0), 0) : vec4(1);
+    return vec4(blockColor.rgb, rtMin);
 }
 
 
@@ -114,7 +118,7 @@ void main() {
         f_color.xyz = sky(normalize(rayDirection));
     } else {
         vec4 block;
-        vec3 albedo = vec3(1);
+        vec3 albedo = d.rgb;
         vec2 dist = vec2(.00000001, 10);
 
 
@@ -148,21 +152,26 @@ void main() {
         }
 
 
-        // INDIRECT SUN
+
         ro += rd * result.w;
         rd = normalize(rand + SUN * 64.0);
-        result = hit(ro, rd, normal);
-        if (result.w > 1.0) {
-            albedo *= result.rgb * sky(rd);
-        } else {
-            albedo *= 0.0;
-        } 
+        // INDIRECT SUN
+        if (result.w <= 1.0) {
+            
+            result = hit(ro, rd, normal);
+            if (result.w > 1.0) {
+                albedo *= result.rgb * sky(rd);
+            } else {
+                albedo *= 0.0;
+            }
+        }
         
     
         // DIRECT SUN
+        
         vec4 sun = hit(p.xyz, rd, normal);
         if (sun.w > 1.0) {
-            sun.rgb = result.rgb * sky(rd);
+            sun.rgb = d.rgb * sky(rd);
         } else {
             sun.rgb = vec3(0);
         }

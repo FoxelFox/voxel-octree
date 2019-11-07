@@ -82,7 +82,7 @@ export class EditNode extends SimpleNode {
 						break;
 
 					case 2:
-						this.grid.modify(start, end, 1);
+						this.grid.modify(start, end, 2);
 						break;
 				}
 

@@ -52,15 +52,17 @@ function balanceWork() {
 
 		lockedBuffer[chunkID] = true;
 		pool.queue(async worker => {
-			worker.work(chunk.id, JSON.stringify(chunks), chunkMesh.v ? chunkMesh.v : undefined, chunkMesh.v ? chunkMesh.rt : undefined).then((mesh) => {
+			worker.work(chunk.id, JSON.stringify(chunks), chunkMesh.v ? chunkMesh.v : undefined, chunkMesh.v ? chunkMesh.rt : undefined, chunkMesh.v ? chunkMesh.colors : undefined).then((mesh) => {
 				if (!chunkMesh.v) {
 					chunkMesh.v = mesh.v;
 					chunkMesh.rt = mesh.rt;
+					chunkMesh.colors = mesh.colors;
 				}
 				chunkMesh.index = mesh.index;
 				results.push({
 					v: mesh.v,
 					rt: mesh.rt,
+					colors: mesh.colors,
 					id: chunk.id,
 					index: chunkMesh.index
 				});

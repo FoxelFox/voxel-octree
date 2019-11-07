@@ -8,6 +8,7 @@ uniform vec3 offset;
 
 in vec4 position;
 in vec3 normal;
+in vec4 color;
 
 out vec4 v_color;
 out vec3 v_normal;
@@ -18,7 +19,7 @@ void main() {
     gl_PointSize = 1.0;
     gl_Position = mvp * position;
 
-    v_color = vec4(1);
+    v_color = color;
 
     v_normal = normal;
     v_position = position.xyz + offset;

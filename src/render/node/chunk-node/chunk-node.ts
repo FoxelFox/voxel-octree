@@ -22,6 +22,7 @@ export class ChunkNode {
 	models: { [key: number]: Model } = {};
 	uploadQueue = [];
 	chunks: Texture;
+	colors: Texture;
 	chunkRTBlocks: number = 0;
 	oldMVP: mat4;
 	currentMVP: mat4 = mat4.create();
@@ -41,6 +42,7 @@ export class ChunkNode {
 		const normal = new Texture(undefined, undefined, null, gl.RGBA16F, gl.RGBA, gl.FLOAT);
 		const position = new Texture(undefined, undefined, null, gl.RGBA32F, gl.RGBA, gl.FLOAT);
 		this.chunks = new Texture(4096, 1, undefined, gl.RGBA32F, gl.RGBA, gl.FLOAT);
+		this.colors = new Texture(4096, 1);
 
 		this.frameBuffer = new FrameBuffer([output, normal, position], false, true);
 		this.grid.getNext().then(n => {
@@ -59,16 +61,20 @@ export class ChunkNode {
 		const position = new ArrayBufferNative(chunk.v, 4 * chunk.index.v * 2, 3, gl.FLOAT);
 		const positionAttribute = this.shader.getAttributeLocation("position");
 		const normalAttribute = this.shader.getAttributeLocation("normal");
+		const colorAttribute = this.shader.getAttributeLocation("color");
 		const matrix = mat4.create();
 
 		gl.bindVertexArray(vao);
 		gl.bindBuffer(gl.ARRAY_BUFFER, position.buffer);
 
 		gl.enableVertexAttribArray(positionAttribute);
-		gl.vertexAttribPointer(positionAttribute, 3, position.type, position.normalize, 4*3*2 , 0);
+		gl.vertexAttribPointer(positionAttribute, 3, position.type, position.normalize, 4*3*2 + 4 , 0);
 
 		gl.enableVertexAttribArray(normalAttribute);
-		gl.vertexAttribPointer(normalAttribute, 3, position.type, position.normalize, 4*3*2, 4*3);
+		gl.vertexAttribPointer(normalAttribute, 3, position.type, position.normalize, 4*3*2 + 4, 4*3);
+
+		gl.enableVertexAttribArray(colorAttribute);
+		gl.vertexAttribPointer(colorAttribute, 4, gl.UNSIGNED_BYTE, position.normalize, 4*3*2 + 4, 4*3*2);
 
 		gl.bindVertexArray(null);
 
@@ -90,6 +96,7 @@ export class ChunkNode {
 				if (chunk.index && chunk.index.v) {
 					this.models[chunkID].position.updateBuffer(chunk.v, 4 * chunk.index.v * 2);
 					this.chunks.update(new Float32Array(chunk.rt));
+					this.colors.update(new Uint8Array(chunk.colors));
 					this.chunkRTBlocks = chunk.index.rt;
 				}
 

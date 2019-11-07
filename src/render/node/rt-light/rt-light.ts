@@ -6,6 +6,7 @@ import {Texture} from "@foxel_fox/glib";
 import {Camera} from "../../camera";
 import {mat4} from "gl-matrix";
 import {ChunkNode} from "../chunk-node/chunk-node";
+import { RTChunkNode } from "../rt-chunk-node/rt-chunk-node";
 
 export class RTLightNode extends SimpleNode {
 
@@ -18,6 +19,7 @@ export class RTLightNode extends SimpleNode {
         private position: Texture,
         private camera: Camera,
         private chunks: Texture,
+        private colors: Texture,
         private chunkNode: ChunkNode,
     ) {
         super(new Shader(require("./rt-light.vs.glsl"), require("./rt-light.fs.glsl")), new Quad() as {});
@@ -58,6 +60,10 @@ export class RTLightNode extends SimpleNode {
         gl.activeTexture(gl.TEXTURE4);
         gl.uniform1i(this.shader.getUniformLocation("tLastRT"), 4);
         gl.bindTexture(gl.TEXTURE_2D, this.frameBuffer.textures[0].webGLTexture);
+
+        gl.activeTexture(gl.TEXTURE5);
+        gl.uniform1i(this.shader.getUniformLocation("tColors"), 5);
+        gl.bindTexture(gl.TEXTURE_2D, this.colors.webGLTexture);
 
         gl.uniform3fv(this.shader.getUniformLocation("cameraPosition"), this.camera.position);
         gl.uniform3fv(this.shader.getUniformLocation("cameraRotation"), [this.camera.rotX, this.camera.rotY, 0 ]);

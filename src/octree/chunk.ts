@@ -9,5 +9,6 @@ export interface VoxelsOnGPU {
 	id: number[]
 	v?: any
 	rt?: any
+	colors?: any
 	index?: { v: number, rt: number }
 }

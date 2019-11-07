@@ -1,8 +1,22 @@
 import {TraversalInfo} from "./node";
-import {childDirections, map3D1D} from "../util";
+import {childDirections, map3D1D, rgba} from "../util";
 import {expose, Transfer} from "threads/worker";
 
-export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v: number, rt: number}): {v: number, rt: number} {
+
+
+
+const colorMap = {
+	1: rgba(255, 255, 255, 0),
+	2: rgba(255, 0, 0, 0)
+}
+
+export function createMesh (
+	out: Float32Array,
+	rt: Float32Array,
+	colors: Float32Array,
+	info,
+	index: {v: number, rt: number, c: number}
+): {v: number, rt: number, c: number} {
 	if (info.node.children) {
 		for (const childID in info.node.children) {
 			const childDirection = childDirections[childID];
@@ -18,7 +32,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 					info.position[2] + childDirection[2] * childSize
 				]
 			};
-			index = createMesh(out, rt, childInfo, index);
+			index = createMesh(out, rt, colors, childInfo, index);
 		}
 		return index;
 
@@ -52,6 +66,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 0;
 		out[index.v++] = 1;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] + offset;
 		out[index.v++] = info.position[1] - offset;
@@ -59,6 +74,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 0;
 		out[index.v++] = 1;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] + offset;
 		out[index.v++] = info.position[1] + offset;
@@ -66,6 +82,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 0;
 		out[index.v++] = 1;
+		out[index.v++] = colorMap[info.node.data];
 
 		// top 2
 		out[index.v++] = info.position[0] - offset;
@@ -74,6 +91,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 0;
 		out[index.v++] = 1;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] + offset;
 		out[index.v++] = info.position[1] + offset;
@@ -81,6 +99,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 0;
 		out[index.v++] = 1;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] - offset;
 		out[index.v++] = info.position[1] + offset;
@@ -88,6 +107,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 0;
 		out[index.v++] = 1;
+		out[index.v++] = colorMap[info.node.data];
 
 
 		// bottom 1
@@ -98,6 +118,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 0;
 		out[index.v++] = -1;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] - offset;
 		out[index.v++] = info.position[1] - offset;
@@ -105,6 +126,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 0;
 		out[index.v++] = -1;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] + offset;
 		out[index.v++] = info.position[1] + offset;
@@ -112,6 +134,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 0;
 		out[index.v++] = -1;
+		out[index.v++] = colorMap[info.node.data];
 
 		// bottom 2
 		out[index.v++] = info.position[0] + offset;
@@ -120,6 +143,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 0;
 		out[index.v++] = -1;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] - offset;
 		out[index.v++] = info.position[1] - offset;
@@ -127,6 +151,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 0;
 		out[index.v++] = -1;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] - offset;
 		out[index.v++] = info.position[1] + offset;
@@ -134,6 +159,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 0;
 		out[index.v++] = -1;
+		out[index.v++] = colorMap[info.node.data];
 
 		// Front 1
 		out[index.v++] = info.position[0] - offset;
@@ -142,6 +168,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 1;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] - offset;
 		out[index.v++] = info.position[1] + offset;
@@ -149,6 +176,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 1;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] + offset;
 		out[index.v++] = info.position[1] + offset;
@@ -156,6 +184,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 1;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		// Front 2
 		out[index.v++] = info.position[0] - offset;
@@ -164,6 +193,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 1;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] + offset;
 		out[index.v++] = info.position[1] + offset;
@@ -171,6 +201,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 1;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] + offset;
 		out[index.v++] = info.position[1] + offset;
@@ -178,6 +209,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = 1;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		// back 1
 		out[index.v++] = info.position[0] - offset;
@@ -186,6 +218,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = -1;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] - offset;
 		out[index.v++] = info.position[1] - offset;
@@ -193,6 +226,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = -1;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] + offset;
 		out[index.v++] = info.position[1] - offset;
@@ -200,6 +234,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = -1;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		// back 2
 		out[index.v++] = info.position[0] + offset;
@@ -208,6 +243,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = -1;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] - offset;
 		out[index.v++] = info.position[1] - offset;
@@ -215,6 +251,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = -1;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] + offset;
 		out[index.v++] = info.position[1] - offset;
@@ -222,6 +259,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 0;
 		out[index.v++] = -1;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 
 		// right 1
@@ -231,6 +269,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 1;
 		out[index.v++] = 0;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] + offset;
 		out[index.v++] = info.position[1] + offset;
@@ -238,6 +277,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 1;
 		out[index.v++] = 0;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] + offset;
 		out[index.v++] = info.position[1] - offset;
@@ -245,6 +285,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 1;
 		out[index.v++] = 0;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		// right 2
 
@@ -254,6 +295,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 1;
 		out[index.v++] = 0;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] + offset;
 		out[index.v++] = info.position[1] + offset;
@@ -261,6 +303,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 1;
 		out[index.v++] = 0;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] + offset;
 		out[index.v++] = info.position[1] - offset;
@@ -268,6 +311,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = 1;
 		out[index.v++] = 0;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		// left 1
 		out[index.v++] = info.position[0] - offset;
@@ -276,6 +320,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = -1;
 		out[index.v++] = 0;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] - offset;
 		out[index.v++] = info.position[1] - offset;
@@ -283,6 +328,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = -1;
 		out[index.v++] = 0;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] - offset;
 		out[index.v++] = info.position[1] - offset;
@@ -290,6 +336,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = -1;
 		out[index.v++] = 0;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		// left 2
 
@@ -299,6 +346,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = -1;
 		out[index.v++] = 0;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] - offset;
 		out[index.v++] = info.position[1] + offset;
@@ -306,6 +354,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = -1;
 		out[index.v++] = 0;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		out[index.v++] = info.position[0] - offset;
 		out[index.v++] = info.position[1] - offset;
@@ -313,6 +362,7 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		out[index.v++] = -1;
 		out[index.v++] = 0;
 		out[index.v++] = 0;
+		out[index.v++] = colorMap[info.node.data];
 
 		// top 1
 		rt[index.rt++] = info.position[0];
@@ -321,13 +371,15 @@ export function createMesh(out: Float32Array, rt: Float32Array, info, index: {v:
 		rt[index.rt++] = offset;
 
 
+		colors[index.c++] = colorMap[info.node.data];
+
 		return index;
 	}
 }
 
 const worker = {
 
-	work(id: number[], chunks: string, mesh?, rtBlocks?) {
+	work(id: number[], chunks: string, mesh?, pBlocks?, pColors?) {
 		const parsed = JSON.parse(chunks);
 		const master = parsed[map3D1D(id)];
 		if (!mesh) {
@@ -336,8 +388,11 @@ const worker = {
 		const b = mesh ? mesh : new SharedArrayBuffer(16777216 * 3 * 4);
 		const f32 = new Float32Array(b);
 
-		const rt = rtBlocks ? rtBlocks : new SharedArrayBuffer(16 * 16 * 16 * 4 * 4);
-		const rt32 = new Float32Array(rt);
+		const blocks = pBlocks ? pBlocks : new SharedArrayBuffer(16 * 16 * 16 * 4 * 4);
+		const blocks32 = new Float32Array(blocks);
+
+		const colors = pColors ? pColors : new SharedArrayBuffer(16 * 16 * 16 * 4 * 4);
+		const colors32 = new Float32Array(colors);
 
 		const info = {
 			depth: 0,
@@ -347,13 +402,15 @@ const worker = {
 			node: master.tree
 		};
 
-		const index = createMesh(f32, rt32, info, { v: 0, rt: 0 });
-		index.v /= 6;
+		const index = createMesh(f32, blocks32, colors32, info, { v: 0, rt: 0, c: 0 });
+		index.v /= 7;
 		index.rt /= 4;
+
 		return {
 			index: index,
 			v: f32.buffer,
-			rt: rt32.buffer
+			rt: blocks32.buffer,
+			colors: colors32.buffer
 		};
 	}
 };
