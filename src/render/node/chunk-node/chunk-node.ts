@@ -74,7 +74,7 @@ export class ChunkNode {
 		gl.vertexAttribPointer(normalAttribute, 3, position.type, position.normalize, 4*3*2 + 4, 4*3);
 
 		gl.enableVertexAttribArray(colorAttribute);
-		gl.vertexAttribPointer(colorAttribute, 4, gl.UNSIGNED_BYTE, position.normalize, 4*3*2 + 4, 4*3*2);
+		gl.vertexAttribPointer(colorAttribute, 4, gl.UNSIGNED_BYTE, true, 4*3*2 + 4, 4*3*2);
 
 		gl.bindVertexArray(null);
 

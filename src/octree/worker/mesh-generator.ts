@@ -7,7 +7,15 @@ import {expose, Transfer} from "threads/worker";
 
 const colorMap = {
 	1: rgba(255, 255, 255, 0),
-	2: rgba(255, 0, 0, 0)
+	2: rgba(244, 67, 54, 0),
+	3: rgba(76, 175, 80, 0),
+	4: rgba(33, 150, 243, 0),
+	5: rgba(255, 235, 59, 0),
+	6: rgba(0, 188, 212, 0),
+	7: rgba(156, 39, 176, 0),
+	8: rgba(255, 152, 0, 0),
+	9: rgba(233, 30, 99, 0),
+	10: rgba(198, 255, 0, 0)
 }
 
 export function createMesh (

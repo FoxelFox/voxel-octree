@@ -4,6 +4,20 @@ import {mat4} from "gl-matrix";
 import {Camera} from "../../camera";
 import {OctreeGrid} from "../../../octree/grid";
 
+
+const keyToDataMap = {
+	"Digit1": 1,
+	"Digit2": 2,
+	"Digit3": 3,
+	"Digit4": 4,
+	"Digit5": 5,
+	"Digit6": 6,
+	"Digit7": 7,
+	"Digit8": 8,
+	"Digit9": 9,
+	"Digit0": 10,
+};
+
 export class EditNode extends SimpleNode {
 
 	readPixelPosition = new Float32Array(4);
@@ -11,6 +25,8 @@ export class EditNode extends SimpleNode {
 
 	size = 64;
 	scale = 0.0625;
+
+	activeData: number = 1;
 
 	constructor (
 		private position: Texture,
@@ -82,13 +98,19 @@ export class EditNode extends SimpleNode {
 						break;
 
 					case 2:
-						this.grid.modify(start, end, 2);
+						this.grid.modify(start, end, this.activeData);
 						break;
 				}
 
 
 			}
-		})
+		});
+
+		document.addEventListener("keyup", (e) => {
+			if (keyToDataMap[e.code]) {
+				this.activeData = keyToDataMap[e.code];
+			}
+		});
 	}
 
 	handleUserInput() {
