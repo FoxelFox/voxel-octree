@@ -1,5 +1,5 @@
 #version 300 es
-precision lowp float;
+precision highp float;
 
 uniform sampler2D tDiffuse;
 uniform sampler2D tNormal;
@@ -179,6 +179,7 @@ void main() {
 
 
         f_color.rgb = (albedo + sun.rgb ) / 2.0;
+        f_color.w = p.w;
 
     }
 }

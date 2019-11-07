@@ -12,6 +12,7 @@ uniform sampler2D tChunks;
 uniform mat4 oldMVP;
 uniform int rtBlocks;
 uniform vec2 sampleSize;
+uniform vec2 sampleRTSize;
 
 in vec2 v_texCoord;
 
@@ -38,36 +39,43 @@ vec3 hash32(uvec2 x)
 void main() {
 
     vec3 d = texture(tDiffuse, v_texCoord).rgb;
-    //vec3 n = texture(tNormal, v_texCoord).xyz;
-    vec3 p = texture(tPosition, v_texCoord).xyz;
+    vec3 n = texture(tNormal, v_texCoord).xyz;
+    vec4 p = texture(tPosition, v_texCoord);
 
-    vec3 rtC = texture(tRTLight, v_texCoord).rgb;
+    vec4 rtC = texture(tRTLight, v_texCoord);
 
 
     vec4 posOld = oldMVP * vec4(p.xyz, 1.0);
     vec2 uvOld = (posOld.xy / posOld.w) * 0.5 + 0.5;
-    vec3 rtL = texture(tRTFiltered, uvOld).rgb;
 
-    float blend = 0.7;
+
+    vec4 rtL = texture(tRTFiltered, uvOld);
+
+    float blend = 0.95;
 
     // TODO
-    if (abs(uvOld.x -0.5) > 0.5 || abs(uvOld.y-0.5) > 0.5) {
-        blend = 0.1;
+    if (abs(uvOld.x -0.5) > 0.5 || abs(uvOld.y-0.5) > 0.5 || abs(rtL.w - rtC.w) > 0.05) {
+        blend = 0.25;
     }
 
 
     vec3 mx = vec3(0);
     vec3 mn = vec3(1);
+    int samples = 0;
+    
+    float bounds = 2.0;
+    vec3 sum = vec3(0);
 
-
-    for (float x = -1.; x <= 1.; x+=1.) {
-        for (float y = -1.; y <= 1.; y+=1.) {
-            vec3 rtc = texture(tRTLight, v_texCoord + vec2(x, y) * sampleSize).rgb;
-            mx = max(rtc, mx);
-            mn = min(rtc, mn);
-        }
+    if (length(n.xyz) < 0.1 || length(n.xyz) > 1.1) {
+        outColor = rtC;
+    } else {
+        outColor = mix(rtC, rtL, blend);     
+        outColor.w = rtC.w;
     }
 
-    vec3 clamped = clamp(rtL, mn, mx);
-    outColor.rgb = mix(rtC, clamped, blend);
+    
+
+    
+    
+    
 }

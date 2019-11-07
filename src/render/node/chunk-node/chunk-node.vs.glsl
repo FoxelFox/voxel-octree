@@ -12,7 +12,7 @@ in vec4 color;
 
 out vec4 v_color;
 out vec3 v_normal;
-out vec3 v_position;
+out vec4 v_position;
 out vec3 wire;
 
 void main() {
@@ -22,7 +22,9 @@ void main() {
     v_color = color;
 
     v_normal = normal;
-    v_position = position.xyz + offset;
+    v_position.xyz = position.xyz + offset;
+    v_position.w = gl_Position.w;
+
 
     int id = gl_VertexID % 3;
 
