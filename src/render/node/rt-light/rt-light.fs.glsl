@@ -131,7 +131,8 @@ void main() {
 
         rd = normalize(rand + normal);
         ro += rd * result.w;
-        for (int i = 0; i < 1; ++i) {
+        int len = int(gl_FragCoord.x + gl_FragCoord.y + frame) % 2 + 1;
+        for (int i = 0; i < len; ++i) {
             
             
             result = hit(ro , rd, normal);
