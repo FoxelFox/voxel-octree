@@ -3,7 +3,7 @@ import {ChunkNode} from "../chunk-node/chunk-node";
 import {RTLightNode} from "../rt-light/rt-light";
 import {canvas, gl} from "../../context";
 import {mat4} from "gl-matrix";
-import {RTGINode} from "../rt-gi/rt-gi";
+import {RTGINode} from "../denoiser/denoiser";
 
 export class OutputNode extends SimpleNode {
 

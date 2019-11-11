@@ -9,7 +9,7 @@ export class RTGINode extends SimpleNode {
 		private chunkNode: ChunkNode,
 		private rtLightNode: RTLightNode
 	) {
-		super(new Shader(require("./rt-gi.vs.glsl"), require("./rt-gi.fs.glsl")), new Quad() as {});
+		super(new Shader(require("./denoiser.vs.glsl"), require("./denoiser.fs.glsl")), new Quad() as {});
 	}
 
 	init(): void {

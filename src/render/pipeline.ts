@@ -4,7 +4,7 @@ import {OctreeGrid} from "../octree/grid";
 import {EditNode} from "./node/edit/edit-node";
 import {RTChunkNode} from "./node/rt-chunk-node/rt-chunk-node";
 import {ChunkNode} from "./node/chunk-node/chunk-node";
-import {RTGINode} from "./node/rt-gi/rt-gi";
+import {RTGINode} from "./node/denoiser/denoiser";
 import {OutputNode} from "./node/output/output";
 
 export class Pipeline {
