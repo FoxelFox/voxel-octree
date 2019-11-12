@@ -44,7 +44,7 @@ export class ChunkNode {
 		this.chunks = new Texture(4096, 1, undefined, gl.RGBA32F, gl.RGBA, gl.FLOAT);
 		this.colors = new Texture(4096, 1);
 
-		this.frameBuffer = new FrameBuffer([output, normal, position], false, true);
+		this.frameBuffer = new FrameBuffer([output, normal, position], true, true);
 		this.grid.getNext().then(n => {
 			if (n) {
 				this.uploadQueue.push(n);
@@ -117,6 +117,7 @@ export class ChunkNode {
 	render() {
 		this.upload();
 		this.frameBuffer.bind();
+		
 		gl.enable(gl.DEPTH_TEST);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -147,5 +148,7 @@ export class ChunkNode {
 				gl.drawArrays(gl.TRIANGLES, 0, model.vertexCount);
 			}
 		}
+
+		this.frameBuffer.flip();
 	}
 }

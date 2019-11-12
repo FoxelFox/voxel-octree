@@ -39,7 +39,7 @@ export class Pipeline {
 		);
 		this.rtLightNode.init();
 
-		this.rtGINode = new RTGINode(this.chunkNode, this.rtLightNode);
+		this.rtGINode = new RTGINode(this.chunkNode, this.rtLightNode, this.camera);
 		this.rtGINode.init();
 
 		this.output = new OutputNode(this.rtGINode);

@@ -1,9 +1,15 @@
 #version 300 es
-precision lowp float;
+precision highp float;
 
 uniform sampler2D tDiffuse;
 uniform sampler2D tNormal;
 uniform sampler2D tPosition;
+
+uniform sampler2D tDiffuseL;
+uniform sampler2D tNormalL;
+uniform sampler2D tPositionL;
+uniform sampler2D tRTLightL;
+
 
 uniform sampler2D tRTLight;
 uniform sampler2D tRTFiltered;
@@ -13,27 +19,11 @@ uniform mat4 oldMVP;
 uniform int rtBlocks;
 uniform vec2 sampleSize;
 uniform vec2 sampleRTSize;
+uniform float reset;
 
 in vec2 v_texCoord;
 
 out vec4 outColor;
-
-
-#define MAX_DIST 1e10
-
-
-uint baseHash( uvec2 p ) {
-    p = 1103515245U*((p >> 1U)^(p.yx));
-    uint h32 = 1103515245U*((p.x)^(p.y>>3U));
-    return h32^(h32 >> 16);
-}
-
-vec3 hash32(uvec2 x)
-{
-    uint n = baseHash(x);
-    uvec3 rz = uvec3(n, n*16807U, n*48271U);
-    return vec3((rz >> 1) & uvec3(0x7fffffffU))/float(0x7fffffff);
-}
 
 
 void main() {
@@ -44,39 +34,62 @@ void main() {
 
     vec4 rtC = texture(tRTLight, v_texCoord);
 
-
     vec4 posOld = oldMVP * vec4(p.xyz, 1.0);
     vec2 uvOld = (posOld.xy / posOld.w) * 0.5 + 0.5;
 
 
-    vec3 nL = texture(tNormal, uvOld).xyz;
-    vec3 dL = texture(tDiffuse, uvOld).rgb;
-    vec4 rtL = texture(tRTFiltered, uvOld);
+    vec3 nL = texture(tNormalL, uvOld).xyz;
+    vec3 dL = texture(tDiffuseL, uvOld).rgb;
+    vec4 pL = texture(tPositionL, uvOld);
+    vec4 rtL = texture(tRTLightL, uvOld);
 
-    float blend = (n == nL && d == dL)  ? 0.94 : 0.7;
+    vec4 sum = texture(tRTFiltered, uvOld);
+
+    float blend = (n == nL && d == dL && abs(pL.w - p.w) < 0.01)  ? reset : 0.0;
+
 
     // TODO
-    if (abs(uvOld.x -0.5) > 0.5 || abs(uvOld.y-0.5) > 0.5 || abs(rtL.w - rtC.w) > 0.01 || d != dL ) {
-        blend = 0.1;
-        rtL = texture(tRTFiltered, v_texCoord);
+    if (abs(uvOld.x -0.5) > 0.5 || abs(uvOld.y-0.5) > 0.5) {
+        blend = 0.0;
+        rtL = texture(tRTLightL, v_texCoord);
     }
     
     
     if (length(n.xyz) < 0.1 || length(n.xyz) > 1.1) {
         // cursor
-        outColor = rtC;
+        outColor = vec4(rtC.rgb, 1.0);
     } else {
         //outColor = mix(rtC, rtL, blend);     
 
+        vec3 mx = vec3(0);
+        vec3 mn = vec3(1);
 
+        for (float x = -1.; x <= 1.; x+=1.) {
+            for (float y = -1.; y <= 1.; y+=1.) {
+                vec3 rtc = texture(tRTLight, v_texCoord + vec2(x, y) * sampleSize).rgb;
+                mx = max(rtc, mx);
+                mn = min(rtc, mn);
+            }
+        }
 
+        vec3 clamped = clamp(sum.rgb / sum.w, mn, mx);
+        vec3 cL = mix(rtC.rgb, clamped, 0.5);
+
+        // if (blend > 0.5) {
+        //     outColor = sum + vec4(cL, 1);
+        // } else {
+
+            
+        // }
 
         
-        outColor.rgb = mix(rtC.rgb, rtL.rgb , blend);
-
-
-        outColor.w = rtC.w;
-        // outColor.rgb = sum / float(samples);
+        if (blend > 0.5) {
+            outColor = sum + vec4(rtC.rgb, 1.0);
+        } else {
+            outColor = vec4(rtC.rgb, 1.0);
+        }
+        
+    
     }
     
 }
