@@ -45,50 +45,29 @@ void main() {
 
     vec4 sum = texture(tRTFiltered, uvOld);
 
-    float blend = ( d == dL && abs(pL.w - p.w) < 0.01)  ? 0.94 : 0.0;
+    float blend = (d == dL && abs(pL.w - p.w) < 0.01)  ? 0.94 : 0.7;
 
 
     // TODO
-    if (abs(uvOld.x -0.5) > 0.5 || abs(uvOld.y-0.5) > 0.5) {
-        blend = 0.25;
-        rtL = texture(tRTLightL, v_texCoord);
+    if (abs(uvOld.x -0.5) > 0.5 || abs(uvOld.y-0.5) > 0.5 ) {
+        blend = 0.5;
+        rtC = texture(tRTLightL, v_texCoord);
     }
     
     
-    if (length(n.xyz) < 0.1 || length(n.xyz) > 1.1) {
+    if (length(n.xyz) < 0.1 || length(n.xyz) > 1.1 || length(nL.xyz) < 0.1 || length(nL.xyz) > 1.1) {
         // cursor
+        blend = 0.5;
         outColor = vec4(rtC.rgb, 1.0);
     } else {
-        //outColor = mix(rtC, rtL, blend);     
-
-        vec3 mx = vec3(0);
-        vec3 mn = vec3(1);
-
-        for (float x = -1.; x <= 1.; x+=1.) {
-            for (float y = -1.; y <= 1.; y+=1.) {
-                vec3 rtc = texture(tRTLight, v_texCoord + vec2(x, y) * sampleSize).rgb;
-                mx = max(rtc, mx);
-                mn = min(rtc, mn);
-            }
-        }
-
-        vec3 clamped = clamp(sum.rgb / sum.w, mn, mx);
-        vec3 cL = mix(rtC.rgb, clamped, 0.5);
-
-        // if (blend > 0.5) {
-        //     outColor = sum + vec4(cL, 1);
-        // } else {
-
-            
-        // }
 
         
-        outColor = vec4(mix(rtC.rgb, sum.rgb / sum.w, blend), 1.0);
+        vec3 mixout = mix(rtC.rgb, sum.rgb / sum.w, blend);
 
-        if (reset < 0.5) {
-            outColor = sum + vec4(rtC.rgb, 1.0);
+        if (reset > 0.0) {
+            outColor = sum + vec4(mix (mixout, rtC.rgb, reset) , 1.0);
         } else {
-            outColor = vec4(mix(rtC.rgb, sum.rgb / sum.w, blend), 1.0);
+            outColor = vec4(mixout, 1.0);
         }
         
     

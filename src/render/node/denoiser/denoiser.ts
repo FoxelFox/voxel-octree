@@ -7,7 +7,7 @@ import { Camera } from "../../camera";
 
 export class RTGINode extends SimpleNode {
 
-	reset = true;
+	reset = 0;
 
 	constructor (
 		private chunkNode: ChunkNode,
@@ -18,17 +18,17 @@ export class RTGINode extends SimpleNode {
 	}
 
 	init(): void {
-		const output = new Texture(undefined, undefined, null, gl.RGBA16F, gl.RGBA, gl.FLOAT);
+		const output = new Texture(undefined, undefined, null, gl.RGBA32F, gl.RGBA, gl.FLOAT);
 		
 		this.frameBuffer = new FrameBuffer([output], true, false);
 
 		document.addEventListener("click", (e) => {
-			this.reset = true;
+			this.reset = 0;
 		});
 
 		document.addEventListener("mousemove", (e) => {
 			if(document.pointerLockElement) {
-				this.reset = true;
+				this.reset = 0;
 			}
 		});
 	}
@@ -36,7 +36,7 @@ export class RTGINode extends SimpleNode {
 	run(): void {
 
 		if (this.camera.backward || this.camera.forward || this.camera.left || this.camera.right) {
-			this.reset = true;
+			this.reset = 0;
 		}
 
 
@@ -93,12 +93,15 @@ export class RTGINode extends SimpleNode {
 		gl.uniform2f(this.shader.getUniformLocation("sampleRTSize"), 1 / this.rtLightNode.frameBuffer.textures[0].x, 1 / this.rtLightNode.frameBuffer.textures[0].y);
 
 		gl.uniform1i(this.shader.getUniformLocation("rtBlocks"), this.chunkNode.chunkRTBlocks);
-		gl.uniform1f(this.shader.getUniformLocation("reset"), this.reset ? 1 : 0);
+		gl.uniform1f(this.shader.getUniformLocation("reset"), this.reset);
 		gl.uniformMatrix4fv(this.shader.getUniformLocation("oldMVP"), false, this.chunkNode.oldMVP);
 
 		gl.bindVertexArray(this.vao);
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
 		this.frameBuffer.flip();
-		this.reset = false;
+		this.reset += 0.05;
+		if (this.reset > 1) {
+			this.reset = 1;
+		}
 	}
 }
