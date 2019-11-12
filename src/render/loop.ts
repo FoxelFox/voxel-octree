@@ -2,8 +2,9 @@ import {Pipeline} from "./pipeline";
 import {canvas, gl, pixelRatio} from "./context";
 import {resizeDrawingBuffer} from "@foxel_fox/glib";
 import GLBench from "gl-bench/dist/gl-bench";
+import { resolve } from "dns";
 
-
+let bench;
 
 function resize() {
 	// Lookup the size the browser is displaying the canvas.
@@ -25,11 +26,20 @@ function resize() {
 	}
 }
 
+export function init() {
+	return new Promise(resolve => {
+		bench = new GLBench(gl);
+
+		setTimeout(() => {
+			resolve();
+		}, 16 * 4);
+	});
+}
+
 export function start(grid) {
 
 	const pipeline = new Pipeline(grid);
-
-	let bench = new GLBench(gl);
+	
 	requestAnimationFrame(loop);
 
 	function loop() {
