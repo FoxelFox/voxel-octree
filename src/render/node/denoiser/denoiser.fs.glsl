@@ -45,12 +45,12 @@ void main() {
 
     vec4 sum = texture(tRTFiltered, uvOld);
 
-    float blend = (n == nL && d == dL && abs(pL.w - p.w) < 0.01)  ? reset : 0.0;
+    float blend = ( d == dL && abs(pL.w - p.w) < 0.01)  ? 0.94 : 0.0;
 
 
     // TODO
     if (abs(uvOld.x -0.5) > 0.5 || abs(uvOld.y-0.5) > 0.5) {
-        blend = 0.0;
+        blend = 0.25;
         rtL = texture(tRTLightL, v_texCoord);
     }
     
@@ -83,10 +83,12 @@ void main() {
         // }
 
         
-        if (blend > 0.5) {
+        outColor = vec4(mix(rtC.rgb, sum.rgb / sum.w, blend), 1.0);
+
+        if (reset < 0.5) {
             outColor = sum + vec4(rtC.rgb, 1.0);
         } else {
-            outColor = vec4(rtC.rgb, 1.0);
+            outColor = vec4(mix(rtC.rgb, sum.rgb / sum.w, blend), 1.0);
         }
         
     

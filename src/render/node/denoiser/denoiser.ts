@@ -93,7 +93,7 @@ export class RTGINode extends SimpleNode {
 		gl.uniform2f(this.shader.getUniformLocation("sampleRTSize"), 1 / this.rtLightNode.frameBuffer.textures[0].x, 1 / this.rtLightNode.frameBuffer.textures[0].y);
 
 		gl.uniform1i(this.shader.getUniformLocation("rtBlocks"), this.chunkNode.chunkRTBlocks);
-		gl.uniform1f(this.shader.getUniformLocation("reset"), this.reset ? 0 : 1);
+		gl.uniform1f(this.shader.getUniformLocation("reset"), this.reset ? 1 : 0);
 		gl.uniformMatrix4fv(this.shader.getUniformLocation("oldMVP"), false, this.chunkNode.oldMVP);
 
 		gl.bindVertexArray(this.vao);
