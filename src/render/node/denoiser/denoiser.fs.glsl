@@ -45,19 +45,19 @@ void main() {
 
     vec4 sum = texture(tRTFiltered, uvOld);
 
-    float blend = (d == dL && abs(pL.w - p.w) < 0.01)  ? 0.94 : 0.7;
+    float blend = (d == dL && abs(pL.w - p.w) < 0.01)  ? 0.94 : 0.0;
 
 
     // TODO
     if (abs(uvOld.x -0.5) > 0.5 || abs(uvOld.y-0.5) > 0.5 ) {
-        blend = 0.5;
+        blend = 0.0;
         rtC = texture(tRTLightL, v_texCoord);
     }
     
     
     if (length(n.xyz) < 0.1 || length(n.xyz) > 1.1 || length(nL.xyz) < 0.1 || length(nL.xyz) > 1.1) {
         // cursor
-        blend = 0.5;
+        blend = 0.0;
         outColor = vec4(rtC.rgb, 1.0);
     } else {
 
@@ -70,6 +70,10 @@ void main() {
             outColor = vec4(mixout, 1.0);
         }
         
+
+        // if (v_texCoord.x > 0.5) {
+        //     outColor = vec4(rtC.rgb, 1.0);
+        // }
     
     }
     
