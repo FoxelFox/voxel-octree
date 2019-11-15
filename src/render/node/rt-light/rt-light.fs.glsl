@@ -1,5 +1,7 @@
 #version 300 es
-precision highp float;
+precision lowp float;
+precision lowp int;
+precision lowp sampler2D;
 
 uniform sampler2D tDiffuse;
 uniform sampler2D tNormal;
@@ -119,8 +121,10 @@ vec4 hit(in vec3 ro, in vec3 rd, inout vec3 normal) {
     }
 
     normal = normalMin;
-    vec4 blockColor = minIndex != -1 ? texelFetch(tColors, ivec2(minIndex, 0), 0) : vec4(1);
-    return vec4(blockColor.rgb, rtMin);
+
+    
+    vec4 blockColor = minIndex != -1 ? texelFetch(tColors, ivec2(minIndex, 0), 0) : vec4(0);
+    return vec4(minIndex, 0, 0, rtMin);
 }
 
 
@@ -155,54 +159,65 @@ void main() {
         
         ro += rd * result.w;
         int len = int(gl_FragCoord.x * gl_FragCoord.y + frame) % 3 + 1;
-        for (int i = 0; i < len; ++i) {
-            
-            
-            result = hit(ro , rd, normal);
-            
-            
-            if (result.w > 1.0) {
-                albedo *= sky(rd);
-                break;
-            } else {
-                albedo *= result.rgb;
-            } 
+        
+        int i = 0;
 
-            if (i > 0) {
-                ro += rd * result.w;
-                rd = cosWeightedRandomHemisphereDirection(normal, seed);
-            
+        if (d.w == 0.0) {
+            while (true) {
+                        
+                        
+                result = hit(ro , rd, normal);
+                vec4 block = texelFetch(tColors, ivec2(result.x, 0), 0);
+                
+
+                if (result.w > 1.0) {
+                    albedo *= sky(rd);
+                    break;
+                } else if (block.w > 0.0){
+                    albedo *= block.rgb + block.rgb * block.w * 1.25;
+                    break;
+                } else {
+                    if (len == ++i) {
+
+                        // last try to hit sun
+                        rd = normalize(rand + SUN * 64.0);    
+                        result = hit(ro, rd, normal);
+                    
+                        if (result.w > 1.0) {
+                            albedo *= block.rgb * sky(rd);
+                        } else {
+                            albedo *= 0.0;
+                        }
+                        
+                        break;
+                    }
+
+                    
+                    albedo *= block.rgb;
+
+                    ro += rd * result.w;
+                    rd = cosWeightedRandomHemisphereDirection(normal, seed);
+                    
+                }         
             }
+
+        } else {
+            albedo += albedo;
         }
 
+        
 
 
-        ro += rd * result.w;
-        rd = normalize(rand + SUN * 64.0);
-        // INDIRECT SUN
-        if (result.w <= 1.0) {
-            
-            result = hit(ro, rd, normal);
-            if (result.w > 1.0) {
-                albedo *= result.rgb * sky(rd);
-            } else {
-                albedo *= 0.0;
-            }
-        }
+
         
     
-        // DIRECT SUN
-        
-        vec4 sun = hit(p.xyz, rd, normal);
-        if (sun.w > 1.0) {
-            sun.rgb = d.rgb * sky(rd);
-        } else {
-            sun.rgb = vec3(0);
-        }
         
 
 
-        f_color.rgb = (albedo + sun.rgb ) / 2.0;
+        
+
+
+        f_color.rgb = (albedo ) ;
         f_color.w = p.w;
     
 

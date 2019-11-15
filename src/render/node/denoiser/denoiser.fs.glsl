@@ -1,5 +1,5 @@
 #version 300 es
-precision highp float;
+precision lowp float;
 
 uniform sampler2D tDiffuse;
 uniform sampler2D tNormal;
@@ -45,7 +45,7 @@ void main() {
 
     vec4 sum = texture(tRTFiltered, uvOld);
 
-    float blend = (d == dL && abs(pL.w - p.w) < 0.01)  ? 0.94 : 0.0;
+    float blend = ( d == dL && abs(pL.w - p.w) < 0.01)  ? 0.94 : 0.25;
 
 
     // TODO

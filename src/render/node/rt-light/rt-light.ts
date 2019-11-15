@@ -27,7 +27,8 @@ export class RTLightNode extends SimpleNode {
 
     init() {
 
-        const output = new Texture(this.size, this.size);
+        const output = new Texture(undefined, undefined, null, gl.RGBA32F, gl.RGBA, gl.FLOAT);
+        
 
         this.frameBuffer = new FrameBuffer([output], true, false);
 
