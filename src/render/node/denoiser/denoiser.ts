@@ -99,7 +99,7 @@ export class RTGINode extends SimpleNode {
 		gl.bindVertexArray(this.vao);
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
 		this.frameBuffer.flip();
-		this.reset += 0.05;
+		this.reset += 0.01;
 		if (this.reset > 1) {
 			this.reset = 1;
 		}

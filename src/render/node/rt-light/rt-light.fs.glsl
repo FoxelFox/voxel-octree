@@ -1,7 +1,7 @@
 #version 300 es
 precision lowp float;
 precision lowp int;
-precision lowp sampler2D;
+
 
 uniform sampler2D tDiffuse;
 uniform sampler2D tNormal;
@@ -205,20 +205,9 @@ void main() {
             albedo += albedo;
         }
 
-        
-
-
-
-        
-    
-        
-
-
-        
-
 
         f_color.rgb = (albedo ) ;
-        f_color.w = p.w;
+        //f_color.w = p.w;
     
 
     }
