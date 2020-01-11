@@ -7,5 +7,5 @@ Controls:
 * Movement W A S D + Mouse
 * place Voxel on Players center with E
 
-Live Demo: https://64f.de/voxel-octree-rt-v5/
+Live Demo: https://64f.de/voxel-octree-rt-v6/
 
