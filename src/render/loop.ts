@@ -3,6 +3,7 @@ import {canvas, gl, pixelRatio} from "./context";
 import {resizeDrawingBuffer} from "@foxel_fox/glib";
 import GLBench from "gl-bench/dist/gl-bench";
 import { resolve } from "dns";
+import {PipelineCpu} from "./pipeline-cpu";
 
 let bench;
 
@@ -38,7 +39,7 @@ export function init() {
 
 export function start(grid) {
 
-	const pipeline = new Pipeline(grid);
+	const pipeline = new PipelineCpu(grid);
 	
 	requestAnimationFrame(loop);
 
@@ -46,8 +47,12 @@ export function start(grid) {
 		bench.nextFrame();
 		bench.begin();
 		resize();
-		pipeline.run();
-		bench.end();
-		requestAnimationFrame(loop);
+		pipeline.run().then(() => {
+
+			bench.end();
+			requestAnimationFrame(loop);
+		});
+
+
 	}
 }
