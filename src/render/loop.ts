@@ -5,7 +5,7 @@ import GLBench from "gl-bench/dist/gl-bench";
 import { resolve } from "dns";
 import {PipelineCpu} from "./pipeline-cpu";
 
-let bench;
+export let bench;
 
 function resize() {
 	// Lookup the size the browser is displaying the canvas.
@@ -40,16 +40,16 @@ export function init() {
 export function start(grid) {
 
 	const pipeline = new PipelineCpu(grid);
-	
+
 	requestAnimationFrame(loop);
 
 	function loop() {
-		bench.nextFrame();
-		bench.begin();
+
 		resize();
+		//requestAnimationFrame(loop);
 		pipeline.run().then(() => {
 
-			bench.end();
+			//bench.end();
 			requestAnimationFrame(loop);
 		});
 
