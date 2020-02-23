@@ -1,4 +1,4 @@
-import {expose, Transfer} from "threads/worker";
+import {expose} from "threads/worker";
 import {Observable} from "threads/observable";
 
 let data = [];
@@ -25,12 +25,10 @@ const worker = {
     work(start, end, width) {
         for (let y = start; y < end; y++) {
             for (let x = 0; x < width; x++) {
-                // for (let g = 0; g < 128; g++) {
                 data[sync][(x + y * width) * 4] = Math.random() * 255;
                 data[sync][(x + y * width) * 4 + 1] = Math.random() * 255;
                 data[sync][(x + y * width) * 4 + 2] = Math.random() * 255;
                 data[sync][(x + y * width) * 4 + 3] = Math.random() * 255;
-                //}
             }
         }
 

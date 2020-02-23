@@ -2,8 +2,7 @@ import {Camera} from "../../camera";
 import {OctreeGrid} from "../../../octree/grid";
 import {Quad, Shader, SimpleNode, Texture} from "@foxel_fox/glib";
 import {canvas, gl} from "../../context";
-import {Pool, spawn, Transfer, Worker} from "threads/dist";
-import {MeshGeneratorWorker} from "../../../octree/worker/mesh-generator";
+import {spawn, Worker} from "threads/dist";
 import {ChunkWorker} from "./chunk-worker";
 import {bench} from "../../loop";
 
@@ -16,9 +15,6 @@ export class ChunkNodeCpu extends SimpleNode {
     threads: ChunkWorker[] = [];
     sync = [0, 0];
     syncIndex = 0;
-
-    ready: boolean = false;
-    lastTime;
 
     constructor (
         private camera: Camera,
@@ -88,11 +84,7 @@ export class ChunkNodeCpu extends SimpleNode {
                 }
             }
 
-
             if (this.sync[this.syncIndex] === this.threads.length) {
-
-                let offset = 0;
-
 
                 this.texture.update(this.dataView[this.syncIndex]);
                 this.sync[this.syncIndex] = 0;
@@ -106,23 +98,13 @@ export class ChunkNodeCpu extends SimpleNode {
                     this.threads[i].work(i * range, (i + 1) * range, w);
                 }
 
-
-                const last = this.lastTime;
-                const now = Date.now();
-                //console.log(1000 / (last - now) + " FPS");
                 bench.end();
                 bench.nextFrame();
                 bench.begin();
 
-                this.lastTime = now;
-
             }
 
             resolve();
-
-
-            //await this.pool.completed();
-            //await this.pool.terminate();
         }));
 
     }
