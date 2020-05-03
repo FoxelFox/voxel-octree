@@ -151,7 +151,7 @@ export class Camera {
 	get position(): Float32Array {
 		let out = vec3.create();
 		mat4.getTranslation(out, this.matPosition);
-		return out;
+		return <Float32Array>out;
 	}
 
 }
