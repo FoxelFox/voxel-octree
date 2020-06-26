@@ -16,7 +16,7 @@ out vec4 v_position;
 out vec3 wire;
 
 void main() {
-    gl_PointSize = 1.0;
+    //gl_PointSize = 1.0;
     gl_Position = mvp * position;
 
     v_color = color;

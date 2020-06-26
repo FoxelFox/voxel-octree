@@ -28,4 +28,5 @@ void main() {
     f_color = v_color;
     f_normal = v_normal;
     f_position = v_position;
+    //f_position.w = gl_FragCoord.w;
 }

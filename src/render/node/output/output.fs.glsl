@@ -12,4 +12,5 @@ void main() {
     float gamma = 1.5;
     vec4 sum = texture(tFinal, v_texCoord);
     outColor.rgb = pow(0.95 + log(sum.rgb / sum.w) / 4.0, vec3(gamma));
+    //outColor.rgb =  texture(tFinal, v_texCoord).rgb;
 }
