@@ -1,6 +1,6 @@
 #version 300 es
 
-precision lowp float;
+precision highp float;
 
 in vec4 v_color;
 in vec3 v_normal;
@@ -28,5 +28,4 @@ void main() {
     f_color = v_color;
     f_normal = v_normal;
     f_position = v_position;
-    //f_position.w = gl_FragCoord.w;
 }

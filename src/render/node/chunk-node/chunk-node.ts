@@ -38,8 +38,8 @@ export class ChunkNode {
 	}
 
 	init(): void {
-		const output = new Texture();
-		const normal = new Texture(undefined, undefined, null, gl.RGBA16F, gl.RGBA, gl.FLOAT);
+		const output = new Texture(undefined, undefined, null, undefined, undefined, undefined, gl.LINEAR);
+		const normal = new Texture(undefined, undefined, null, gl.RGBA16F, gl.RGBA, gl.FLOAT, gl.LINEAR);
 		const position = new Texture(undefined, undefined, null, gl.RGBA32F, gl.RGBA, gl.FLOAT);
 		this.chunks = new Texture(4096, 1, undefined, gl.RGBA16F, gl.RGBA, gl.FLOAT);
 		this.colors = new Texture(4096, 1);
