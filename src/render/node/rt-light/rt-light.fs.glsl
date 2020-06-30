@@ -24,7 +24,7 @@ in vec3 rayOrigin;
 layout(location = 0) out vec4 f_color;
 
 #define MAX_DIST 1e10
-#define SUN normalize(vec3(0.5, -0.75, 1.0))
+#define SUN normalize(vec3(cos(frame * 0.001), sin(frame * 0.001), 0.5))
 #define BOUNCES 3;
 
 uint baseHash( uvec2 p ) {

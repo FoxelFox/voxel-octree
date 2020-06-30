@@ -74,7 +74,7 @@ export class RTLightNode extends SimpleNode {
         gl.uniform1f(this.shader.getUniformLocation("frame"), this.frame);
         gl.uniformMatrix4fv(this.shader.getUniformLocation("oldMVP"), false, this.chunkNode.oldMVP);
 
-        if (++this.frame > 10000) {
+        if (++this.frame > 1000000) {
             this.frame = 1;
         }
 
