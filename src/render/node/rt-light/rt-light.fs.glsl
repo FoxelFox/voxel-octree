@@ -103,7 +103,7 @@ vec4 hit(in vec3 ro, in vec3 rd, inout vec3 normal) {
     vec3 normalMin = vec3(0);
     float rt;
     vec4 block;
-    vec2 dist = vec2(.00000001, 10);
+    vec2 dist = vec2(.0001, 10);
     int minIndex = -1;
 
     for (int x = 0; x < rtBlocks; ++x) {

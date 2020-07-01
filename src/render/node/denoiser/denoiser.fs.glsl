@@ -65,7 +65,7 @@ void main() {
     }
 
     // TODO
-    if (abs(uvOld.x -0.5) > 0.5 || abs(uvOld.y-0.5) > 0.5 || distance(d.xyz, dL.xyz) > 0.01 || n != nL || distance(p.xyz, pL.xyz) > 0.005) {
+    if (abs(uvOld.x -0.5) > 0.5 || abs(uvOld.y-0.5) > 0.5 || distance(d.xyz, dL.xyz) > 0.01 || distance(n, nL) > 0.005 || distance(p.xyz, pL.xyz) > 0.005) {
     
         
         sum = vec4(sum.rgb / 2.0, sum.w / 2.0);
@@ -85,7 +85,7 @@ void main() {
 
     
     outColor = sum + vec4(clamp(rtC.rgb, sum.rgb / sum.w - vec3(0.5),sum.rgb / sum.w + vec3(0.5) ), 1.0) ;
-    //outColor = vec4(vec3(posOld.w), 1);
+    //outColor = vec4(rtC.xyz, 1);
 
 
     //outColor.x = texture(tPositionL, uvOld).w;
