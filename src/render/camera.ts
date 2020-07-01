@@ -21,7 +21,7 @@ export class Camera {
 	lastUpdateTime: number = Date.now();
 
 	constructor () {
-		mat4.translate(this.matPosition, this.matPosition, [0, 0, 0]);
+		mat4.translate(this.matPosition, this.matPosition, [0, 0.75, 0]);
 		mat4.rotateX(this.matX, this.matX, this.rotX);
 		mat4.mul(this.matRotation, this.matX, this.matY);
 

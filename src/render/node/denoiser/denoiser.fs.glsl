@@ -59,9 +59,9 @@ void main() {
     //vec4 sum = texture(tRTFiltered, uvOld);
     sum /= 5.0;
 
-    //if (sum.w >= 16.0 && reset < 1.0) {
-    if (sum.w >= 16.0) {
-        sum = vec4(sum.rgb / 1.25, sum.w / 1.25);
+    if (sum.w >= 32.0 && (reset < 1.0 || sum.w >= 64.0)) {
+//    if (sum.w >= 16.0) {
+        sum = vec4(sum.rgb / 1.5, sum.w / 1.5);
     }
 
     // TODO
