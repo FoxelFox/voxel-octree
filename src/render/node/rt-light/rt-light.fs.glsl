@@ -24,7 +24,7 @@ in vec3 rayOrigin;
 layout(location = 0) out vec4 f_color;
 
 #define MAX_DIST 1e10
-#define SUN normalize(vec3(cos(frame * 0.001), sin(frame * 0.001), 0.5))
+#define SUN normalize(vec3(cos(frame * 0.001), sin(frame * 0.001), sin(frame * 0.001)))
 #define BOUNCES 3;
 
 uint baseHash( uvec2 p ) {
@@ -88,13 +88,13 @@ float iBox( in vec3 ro, in vec3 rd, in vec2 distBound, inout vec3 normal, in vec
 
 vec3 sky(vec3 rd) {
     float sun_amount = max(dot(rd, SUN), 0.0);
-    vec3 sun_color = vec3(0.6, .4, 0.2);
+    vec3 sun_color = vec3(0.6 , .4, 0.2);
 
-    vec3  sky = mix(vec3(.75, .73, .71), vec3(.5, .7, .9), 0.25 + rd.z);
+    vec3  sky = mix(vec3(.75, .73, .71), vec3(.5, .7, .9) , 0.25 + rd.z);
     sky = sky + sun_color * min(pow(sun_amount, 1500.0) * 5.0, 1.0);
     sky = sky + sun_color * min(pow(sun_amount, 10.0) * .6, 1.0);
 
-    return sky;
+    return clamp(sky + vec3(SUN.z - 0.75) * vec3(0.5 , .75, 1.0), 0.0, 10.0);
 }
 
 vec4 hit(in vec3 ro, in vec3 rd, inout vec3 normal) {
@@ -143,8 +143,7 @@ void main() {
     } else {
         vec4 block;
         vec3 albedo = d.rgb;
-        vec2 dist = vec2(.00000001, 10);
-
+        vec2 dist = vec2(.0001, 10);
 
         vec3 rand = hash32(uvec2(v_texCoord * 4096.0 * frame)) * 2.0 - 1.0;
         vec3 normal = n.xyz;
