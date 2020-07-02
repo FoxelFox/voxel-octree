@@ -94,7 +94,8 @@ vec3 sky(vec3 rd) {
     sky = sky + sun_color * min(pow(sun_amount, 1500.0) * 5.0, 1.0);
     sky = sky + sun_color * min(pow(sun_amount, 10.0) * .6, 1.0);
 
-    return clamp(sky + vec3(SUN.z - 0.75) * vec3(0.5 , .75, 1.0), 0.0, 10.0);
+    return clamp(sky + vec3(SUN.z - 1.0) * vec3(0.5 , .75, 1.0), 0.0, 10.0);
+    //return sky;
 }
 
 vec4 hit(in vec3 ro, in vec3 rd, inout vec3 normal) {
