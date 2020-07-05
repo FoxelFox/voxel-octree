@@ -5,7 +5,8 @@
 
 Controls:
 * Movement W A S D + Mouse
-* place Voxel on Players center with E
+* select color with 1-9 (0 is light block)
+* place Voxel witch right click
 
-Live Demo: https://64f.de/voxel-octree-rt-v6/
+Live Demo: https://64f.de/voxel-octree-rt-v7/
 

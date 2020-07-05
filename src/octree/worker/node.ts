@@ -10,25 +10,18 @@ export interface TraversalInfo {
     node: OctreeNode
 }
 
-
-
 export function modify(info: TraversalInfo, p1: number[], p2: number[], value: number) {
-    // check merge
+    // check pre merge
     if (
         p1[0] === 0 && p1[1] === 0 && p1[2] === 0 &&
         p2[0] === (info.size -1) && p2[1] === (info.size -1) && p2[2] === (info.size -1)
     ) {
-        // can merged
+        // can pre merged
         info.node.data = value;
-        delete info.node.children; // TODO recycling of Nodes can improve the gc performance.
+        delete info.node.children;
         return
     } else {
         // update
-        // if (info.size === 2) {
-        //     info.node.data = value;
-        //     return;
-        // }
-
         if (!info.node.children) {
             info.node.children = {
                 0: { data: info.node.data },
@@ -57,9 +50,6 @@ export function modify(info: TraversalInfo, p1: number[], p2: number[], value: n
             size: childSize,
             depth: info.depth + 1
         };
-
-
-        // TODO Simplify
 
         if (x0) {
             if (y0) {
@@ -128,25 +118,25 @@ export function modify(info: TraversalInfo, p1: number[], p2: number[], value: n
                 }
             }
         }
-        const childKeys = Object.keys(info.node.children);
-        const same = info.node.children[childKeys[0]].data;
 
+        // post merge
+        const childKeys = Object.keys(info.node.children);
         if (childKeys.length === 8) {
             let canMerge = true;
+            let data;
             for (const key of childKeys) {
-                if (info.node.children[key].children || info.node.children[key].data !== info.node.data) {
+                if (info.node.children[key].children || (data = info.node.children[key].data) === info.node.data) {
                     canMerge = false;
                     break;
                 }
             }
 
             if (canMerge) {
+                info.node.data = data;
                 delete info.node.children;
             }
         }
     }
-
-
 }
 
 function lowerRange(n1, n2, mid) {
@@ -180,10 +170,6 @@ export function getData(info: TraversalInfo, p1: number[]) {
 
         return getData(childInfo, p1);
     }
-
-
-
-
 }
 
 export function childIndex(p: number[]): number {
