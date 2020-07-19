@@ -385,9 +385,56 @@ export function createMesh (
 	}
 }
 
+const oc_size = 64
+
+export function createOctree (
+	out: Float32Array,
+	info,
+	index128: number
+): number {
+	let index32 = index128 * 4;
+	if (info.node.children) {
+
+		for (const childID in info.node.children) {
+			const childInfo = {
+				node: info.node.children[childID],
+				depth: info.depth + 1
+			};
+
+			if (childInfo.node.children) {
+				const childIndex128 = index128 + 8;
+				out[index32++] = (childIndex128 % oc_size) / oc_size;
+				out[index32++] = Math.floor(childIndex128 / oc_size) / oc_size;
+				out[index32++] = info.depth; // empty placeholder
+				out[index32++] = 0; // type 0 stands for node
+				index128 = createOctree(out, childInfo, childIndex128);
+			} else {
+				out[index32++] = colorMap[childInfo.node.data] ? colorMap[childInfo.node.data] : 0;
+				out[index32++] = 0; // empty placeholder
+				out[index32++] = childInfo.depth; // empty placeholder
+				out[index32++] = 1; // type 1 stands for leaf
+			}
+		}
+		return index128;
+	} else {
+		// only if the root has no children
+		if (info.node.data === 0) {
+			return index128;
+		}
+
+		out[index32++] = colorMap[info.node.data];
+		out[index32++] = 0; // empty placeholder
+		out[index32++] = info.depth; // empty placeholder
+		out[index32++] = 1; // type 1 stands for leaf
+
+		return index128;
+	}
+}
+
+
 const worker = {
 
-	work(id: number[], chunks: string, mesh?, pBlocks?, pColors?) {
+	work(id: number[], chunks: string, mesh?, pBlocks?, pColors?, pOctree?) {
 		const parsed = JSON.parse(chunks);
 		const master = parsed[map3D1D(id)];
 		if (!mesh) {
@@ -398,6 +445,9 @@ const worker = {
 
 		const blocks = pBlocks ? pBlocks : new SharedArrayBuffer(16 * 16 * 16 * 4 * 4);
 		const blocks32 = new Float32Array(blocks);
+
+		const octree = pOctree ? pOctree : new SharedArrayBuffer(16 * 16 * 16 * 4 * 4);
+		const octree32 = new Float32Array(octree);
 
 		const colors = pColors ? pColors : new SharedArrayBuffer(16 * 16 * 16 * 4 * 4);
 		const colors32 = new Float32Array(colors);
@@ -414,8 +464,21 @@ const worker = {
 		index.v /= 7;
 		index.rt /= 4;
 
+
+		const infoOC = {
+			depth: 0,
+			position: [0, 0, 0],
+			chunkPosition: id,
+			size: 0.5,
+			node: master.tree
+		};
+
+		const indexOC = createOctree(octree32, infoOC, 0);
+
 		return {
 			index: index,
+			indexOC: indexOC,
+			oc: octree32.buffer,
 			v: f32.buffer,
 			rt: blocks32.buffer,
 			colors: colors32.buffer
