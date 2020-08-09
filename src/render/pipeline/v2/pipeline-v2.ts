@@ -25,6 +25,9 @@ export class PipelineV1 {
 		this.edit.init();
 
 
+		//this.denoiser = new Denoiser(this.chunkNode, this.rtLightNode, this.camera);
+		this.denoiser.init();
+
 		//this.output = new OutputNode(this.rtGINode);
 		//this.output.init();
 

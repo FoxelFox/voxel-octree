@@ -36,7 +36,14 @@ export class PipelineV1 {
 		);
 		this.rtLightNode.init();
 
-		this.denoiser = new Denoiser(this.chunkNode, this.rtLightNode, this.camera);
+		this.denoiser = new Denoiser(
+			this.chunkNode,
+			this.chunkNode.frameBuffer.textures[0],
+			this.chunkNode.frameBuffer.textures[1],
+			this.chunkNode.frameBuffer.textures[2],
+			this.rtLightNode.frameBuffer.textures[0],
+			this.camera
+		);
 		this.denoiser.init();
 
 		this.output = new OutputNode(this.denoiser);

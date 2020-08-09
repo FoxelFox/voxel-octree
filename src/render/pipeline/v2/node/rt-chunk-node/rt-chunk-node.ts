@@ -20,6 +20,9 @@ export class RTChunkNode extends SimpleNode {
 	chunks: Texture;
 	uploadQueue = [];
 	frame = 0;
+	oldMVP: mat4;
+	currentMVP: mat4;
+
 	constructor (
 		private camera: Camera,
 		private grid: OctreeGrid
@@ -82,6 +85,10 @@ export class RTChunkNode extends SimpleNode {
 		mat4.mul(mvp, this.camera.view, modelMatrix);
 		mat4.mul(mvp, this.camera.perspective, mvp);
 		mat4.invert(mvp, mvp);
+
+		this.oldMVP = this.currentMVP;
+		this.currentMVP = mat4.clone(mvp);
+
 		gl.uniformMatrix4fv(this.shader.getUniformLocation("inverseMVP"), false, mvp);
 		gl.uniform3fv(this.shader.getUniformLocation("cameraPosition"), this.camera.position);
 		gl.uniform3fv(this.shader.getUniformLocation("cameraRotation"), [0, this.camera.rotY, this.camera.rotX ]);

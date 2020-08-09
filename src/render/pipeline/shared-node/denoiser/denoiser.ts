@@ -1,17 +1,21 @@
 import {FrameBuffer, Quad, Shader, SimpleNode, Texture} from "@foxel_fox/glib";
-import {ChunkNode} from "../../v1/node/chunk-node/chunk-node";
-import {RTLightNode} from "../../v1/node/rt-light/rt-light";
 import {canvas, gl} from "../../../context";
-import {mat4} from "gl-matrix";
 import { Camera } from "../../../camera";
+
+interface DenoiserRequirement {
+	oldMVP
+}
 
 export class Denoiser extends SimpleNode {
 
 	reset = 0;
 
 	constructor (
-		private chunkNode: ChunkNode,
-		private rtLightNode: RTLightNode,
+		private requirement: DenoiserRequirement,
+		private diffuse: Texture,
+		private normal: Texture,
+		private position: Texture,
+		private albedo: Texture,
 		private camera: Camera,
 	) {
 		super(new Shader(require("./denoiser.vs.glsl"), require("./denoiser.fs.glsl")), new Quad() as {});
@@ -47,54 +51,48 @@ export class Denoiser extends SimpleNode {
 
 		gl.activeTexture(gl.TEXTURE0);
 		gl.uniform1i(this.shader.getUniformLocation("tDiffuse"), 0);
-		gl.bindTexture(gl.TEXTURE_2D, this.chunkNode.frameBuffer.textures[0].webGLTexture);
+		gl.bindTexture(gl.TEXTURE_2D, this.diffuse.webGLTexture);
 
 		gl.activeTexture(gl.TEXTURE1);
 		gl.uniform1i(this.shader.getUniformLocation("tNormal"), 1);
-		gl.bindTexture(gl.TEXTURE_2D, this.chunkNode.frameBuffer.textures[1].webGLTexture);
+		gl.bindTexture(gl.TEXTURE_2D, this.normal.webGLTexture);
 
 		gl.activeTexture(gl.TEXTURE2);
 		gl.uniform1i(this.shader.getUniformLocation("tPosition"), 2);
-		gl.bindTexture(gl.TEXTURE_2D, this.chunkNode.frameBuffer.textures[2].webGLTexture);
+		gl.bindTexture(gl.TEXTURE_2D, this.position.webGLTexture);
 
 		gl.activeTexture(gl.TEXTURE3);
 		gl.uniform1i(this.shader.getUniformLocation("tRTLight"), 3);
-		gl.bindTexture(gl.TEXTURE_2D, this.rtLightNode.frameBuffer.textures[0].webGLTexture);
+		gl.bindTexture(gl.TEXTURE_2D, this.albedo.webGLTexture);
 
 		gl.activeTexture(gl.TEXTURE4);
-		gl.uniform1i(this.shader.getUniformLocation("tChunks"), 4);
-		gl.bindTexture(gl.TEXTURE_2D, this.chunkNode.chunks.webGLTexture);
-
-		gl.activeTexture(gl.TEXTURE5);
-		gl.uniform1i(this.shader.getUniformLocation("tRTFiltered"), 5);
+		gl.uniform1i(this.shader.getUniformLocation("tRTFiltered"), 4);
 		gl.bindTexture(gl.TEXTURE_2D, this.frameBuffer.textures[0].webGLTexture);
 
+		gl.activeTexture(gl.TEXTURE5);
+		gl.uniform1i(this.shader.getUniformLocation("tDiffuseL"), 5);
+		gl.bindTexture(gl.TEXTURE_2D, this.diffuse.webGLTexture2);
 
 		gl.activeTexture(gl.TEXTURE6);
-		gl.uniform1i(this.shader.getUniformLocation("tDiffuseL"), 6);
-		gl.bindTexture(gl.TEXTURE_2D, this.chunkNode.frameBuffer.textures[0].webGLTexture2);
-
-		gl.activeTexture(gl.TEXTURE7);
-		gl.uniform1i(this.shader.getUniformLocation("tNormalL"), 7);
-		gl.bindTexture(gl.TEXTURE_2D, this.chunkNode.frameBuffer.textures[1].webGLTexture2);
+		gl.uniform1i(this.shader.getUniformLocation("tNormalL"), 6);
+		gl.bindTexture(gl.TEXTURE_2D, this.normal.webGLTexture2);
 
 		gl.activeTexture(gl.TEXTURE8);
 		gl.uniform1i(this.shader.getUniformLocation("tPositionL"), 8);
-		gl.bindTexture(gl.TEXTURE_2D, this.chunkNode.frameBuffer.textures[2].webGLTexture2);
+		gl.bindTexture(gl.TEXTURE_2D, this.position.webGLTexture2);
 
 		gl.activeTexture(gl.TEXTURE9);
 		gl.uniform1i(this.shader.getUniformLocation("tRTLightL"), 9);
-		gl.bindTexture(gl.TEXTURE_2D, this.rtLightNode.frameBuffer.textures[0].webGLTexture2);
+		gl.bindTexture(gl.TEXTURE_2D, this.albedo.webGLTexture2);
 
 
 		gl.uniform2f(this.shader.getUniformLocation("sampleSize"), 1 / canvas.width, 1 / canvas.height);
 		
 	
-		gl.uniform2f(this.shader.getUniformLocation("sampleRTSize"), 1 / this.rtLightNode.frameBuffer.textures[0].x, 1 / this.rtLightNode.frameBuffer.textures[0].y);
+		gl.uniform2f(this.shader.getUniformLocation("sampleRTSize"), 1 / this.albedo.x, 1 / this.albedo.y);
 
-		gl.uniform1i(this.shader.getUniformLocation("rtBlocks"), this.chunkNode.chunkRTBlocks);
 		gl.uniform1f(this.shader.getUniformLocation("reset"), this.reset);
-		gl.uniformMatrix4fv(this.shader.getUniformLocation("oldMVP"), false, this.chunkNode.oldMVP);
+		gl.uniformMatrix4fv(this.shader.getUniformLocation("oldMVP"), false, this.requirement.oldMVP);
 
 		gl.bindVertexArray(this.vao);
 		gl.drawArrays(gl.TRIANGLES, 0, 6);

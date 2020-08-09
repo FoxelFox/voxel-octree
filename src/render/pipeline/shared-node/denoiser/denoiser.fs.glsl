@@ -15,7 +15,6 @@ uniform sampler2D tRTLightL;
 
 uniform sampler2D tRTLight;
 uniform sampler2D tRTFiltered;
-uniform sampler2D tChunks;
 
 uniform mat4 oldMVP;
 uniform int rtBlocks;
