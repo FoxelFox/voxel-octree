@@ -1,12 +1,11 @@
 import {FrameBuffer, SimpleNode} from "@foxel_fox/glib"
 import {Shader} from "@foxel_fox/glib";
 import {Quad} from "@foxel_fox/glib";
-import {canvas, gl} from "../../context";
+import {canvas, gl} from "../../../../context";
 import {Texture} from "@foxel_fox/glib";
-import {Camera} from "../../camera";
+import {Camera} from "../../../../camera";
 import {mat4} from "gl-matrix";
 import {ChunkNode} from "../chunk-node/chunk-node";
-import { RTChunkNode } from "../rt-chunk-node/rt-chunk-node";
 
 export class RTLightNode extends SimpleNode {
 

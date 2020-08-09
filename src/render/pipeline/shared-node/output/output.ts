@@ -1,14 +1,14 @@
 import {Quad, Shader, SimpleNode} from "@foxel_fox/glib";
-import {ChunkNode} from "../chunk-node/chunk-node";
-import {RTLightNode} from "../rt-light/rt-light";
-import {canvas, gl} from "../../context";
+import {ChunkNode} from "../../v1/node/chunk-node/chunk-node";
+import {RTLightNode} from "../../v1/node/rt-light/rt-light";
+import {canvas, gl} from "../../../context";
 import {mat4} from "gl-matrix";
-import {RTGINode} from "../denoiser/denoiser";
+import {Denoiser} from "../denoiser/denoiser";
 
 export class OutputNode extends SimpleNode {
 
 	constructor (
-		private rtGINode: RTGINode
+		private rtGINode: Denoiser
 	) {
 		super(new Shader(require("./output.vs.glsl"), require("./output.fs.glsl")), new Quad() as {});
 	}

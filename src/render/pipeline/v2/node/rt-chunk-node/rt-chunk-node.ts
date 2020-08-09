@@ -1,10 +1,10 @@
 import {Shader, SimpleNode, ArrayBufferNative, FrameBuffer, Texture, ArrayBuffer, Quad} from "@foxel_fox/glib";
-import {canvas, gl} from "../../context";
+import {canvas, gl} from "../../../../context";
 import {mat4} from "gl-matrix";
-import {Camera} from "../../camera";
-import {OctreeGrid} from "../../../octree/grid";
-import {map3D1D} from "../../../octree/util";
-import {Chunk, VoxelsOnGPU} from "../../../octree/chunk";
+import {Camera} from "../../../../camera";
+import {OctreeGrid} from "../../../../../octree/grid";
+import {map3D1D} from "../../../../../octree/util";
+import {Chunk, VoxelsOnGPU} from "../../../../../octree/chunk";
 import {Transfer} from "threads/worker";
 
 

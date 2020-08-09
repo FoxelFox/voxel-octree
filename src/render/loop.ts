@@ -1,4 +1,4 @@
-import {Pipeline} from "./pipeline";
+import {PipelineV1} from "./pipeline/v1/pipeline-v1";
 import {canvas, gl, pixelRatio} from "./context";
 import {resizeDrawingBuffer} from "@foxel_fox/glib";
 import GLBench from "gl-bench/dist/gl-bench";
@@ -39,7 +39,7 @@ export function init() {
 
 export function start(grid) {
 
-	const pipeline = new Pipeline(grid);
+	const pipeline = new PipelineV1(grid);
 
 	requestAnimationFrame(loop);
 

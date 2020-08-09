@@ -1,11 +1,11 @@
 import {FrameBuffer, Quad, Shader, SimpleNode, Texture} from "@foxel_fox/glib";
-import {ChunkNode} from "../chunk-node/chunk-node";
-import {RTLightNode} from "../rt-light/rt-light";
-import {canvas, gl} from "../../context";
+import {ChunkNode} from "../../v1/node/chunk-node/chunk-node";
+import {RTLightNode} from "../../v1/node/rt-light/rt-light";
+import {canvas, gl} from "../../../context";
 import {mat4} from "gl-matrix";
-import { Camera } from "../../camera";
+import { Camera } from "../../../camera";
 
-export class RTGINode extends SimpleNode {
+export class Denoiser extends SimpleNode {
 
 	reset = 0;
 

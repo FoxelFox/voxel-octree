@@ -1,17 +1,17 @@
 import {RTLightNode} from "./node/rt-light/rt-light";
-import {Camera} from "./camera";
-import {OctreeGrid} from "../octree/grid";
-import {EditNode} from "./node/edit/edit-node";
+import {Camera} from "../../camera";
+import {OctreeGrid} from "../../../octree/grid";
+import {EditNode} from "../shared-node/edit/edit-node";
 import {ChunkNode} from "./node/chunk-node/chunk-node";
-import {RTGINode} from "./node/denoiser/denoiser";
-import {OutputNode} from "./node/output/output";
-import {generateStartScene} from "../generator/start-scene";
+import {Denoiser} from "../shared-node/denoiser/denoiser";
+import {OutputNode} from "../shared-node/output/output";
+import {generateStartScene} from "../../../generator/start-scene";
 
-export class Pipeline {
+export class PipelineV1 {
 
 	chunkNode: ChunkNode;
 	rtLightNode: RTLightNode;
-	rtGINode: RTGINode;
+	denoiser: Denoiser;
 	edit: EditNode;
 	output: OutputNode;
 	camera: Camera;
@@ -36,10 +36,10 @@ export class Pipeline {
 		);
 		this.rtLightNode.init();
 
-		this.rtGINode = new RTGINode(this.chunkNode, this.rtLightNode, this.camera);
-		this.rtGINode.init();
+		this.denoiser = new Denoiser(this.chunkNode, this.rtLightNode, this.camera);
+		this.denoiser.init();
 
-		this.output = new OutputNode(this.rtGINode);
+		this.output = new OutputNode(this.denoiser);
 		this.output.init();
 
 		generateStartScene(grid);
@@ -50,7 +50,7 @@ export class Pipeline {
 		this.chunkNode.run();
 		this.edit.run();
 		this.rtLightNode.run();
-		this.rtGINode.run();
+		this.denoiser.run();
 		this.output.run();
 	}
 }
