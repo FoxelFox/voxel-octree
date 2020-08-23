@@ -4,8 +4,6 @@ import {mat4} from "gl-matrix";
 import {Camera} from "../../../../camera";
 import {OctreeGrid} from "../../../../../octree/grid";
 import {map3D1D} from "../../../../../octree/util";
-import {Chunk, VoxelsOnGPU} from "../../../../../octree/chunk";
-import {Transfer} from "threads/worker";
 
 
 interface Model {
@@ -18,6 +16,7 @@ interface Model {
 export class RTChunkNode extends SimpleNode {
 
 	chunks: Texture;
+	colors: Texture;
 	uploadQueue = [];
 	frame = 0;
 	oldMVP: mat4;
@@ -35,10 +34,15 @@ export class RTChunkNode extends SimpleNode {
 	}
 
 	init(): void {
-		const output = new Texture();
-		this.chunks = new Texture(4096, 1, undefined, gl.RGBA32F, gl.RGBA, gl.FLOAT);
+		const diffuse = new Texture(undefined, undefined, null, undefined, undefined, undefined, gl.LINEAR);
+		const normal = new Texture(undefined, undefined, null, gl.RGBA16F, gl.RGBA, gl.FLOAT, gl.LINEAR);
+		const position = new Texture(undefined, undefined, null, gl.RGBA32F, gl.RGBA, gl.FLOAT);
+		const albedo = new Texture(undefined, undefined, null, undefined, undefined, undefined, gl.LINEAR);
 
-		this.frameBuffer = new FrameBuffer([output], false, true);
+		this.chunks = new Texture(4096, 1, undefined, gl.RGBA32F, gl.RGBA, gl.FLOAT);
+		this.colors = new Texture(4096, 1);
+
+		this.frameBuffer = new FrameBuffer([diffuse, normal, position, albedo], true, true);
 		this.grid.getNext().then(n => {
 			if (n) {
 				this.uploadQueue.push(n);

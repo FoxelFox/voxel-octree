@@ -5,6 +5,7 @@ import GLBench from "gl-bench/dist/gl-bench";
 import { resolve } from "dns";
 import {Camera} from "./camera";
 import {PipelineV2} from "./pipeline/v2/pipeline-v2";
+import {generateStartScene} from "../generator/start-scene";
 
 
 export let bench;
@@ -44,6 +45,7 @@ export function start(grid) {
 	const camera = new Camera();
 	let pipeline:any = new PipelineV1(grid, camera);
 	let pipeline2:any = new PipelineV2(grid, camera);
+	generateStartScene(grid);
 
 	document.addEventListener('keydown', (element) => {
 		switch (element.key) {

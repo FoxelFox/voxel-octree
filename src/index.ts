@@ -9,7 +9,7 @@ async function main() {
     const grid = await spawn<OctreeGrid>(new Worker("./octree/grid"));
     await grid.initThreads();
     await init();
-    generateStartScene(grid);
+
     start(grid);
 }
 
