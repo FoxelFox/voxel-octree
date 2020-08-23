@@ -3,6 +3,8 @@ import {canvas, gl, pixelRatio} from "./context";
 import {resizeDrawingBuffer} from "@foxel_fox/glib";
 import GLBench from "gl-bench/dist/gl-bench";
 import { resolve } from "dns";
+import {Camera} from "./camera";
+import {PipelineV2} from "./pipeline/v2/pipeline-v2";
 
 
 export let bench;
@@ -39,7 +41,19 @@ export function init() {
 
 export function start(grid) {
 
-	const pipeline = new PipelineV1(grid);
+	const camera = new Camera();
+	let pipeline:any = new PipelineV1(grid, camera);
+	let pipeline2:any = new PipelineV2(grid, camera);
+
+	document.addEventListener('keydown', (element) => {
+		switch (element.key) {
+			case "Tab":
+				let tmp = pipeline;
+				pipeline = pipeline2;
+				pipeline2 = tmp;
+				element.preventDefault();
+		}
+	});
 
 	requestAnimationFrame(loop);
 

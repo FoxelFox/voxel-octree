@@ -14,10 +14,11 @@ export class PipelineV1 {
 	denoiser: Denoiser;
 	edit: EditNode;
 	output: OutputNode;
-	camera: Camera;
 
-	constructor(public grid: OctreeGrid) {
-		this.camera = new Camera();
+	constructor (
+		public grid: OctreeGrid,
+		public camera: Camera
+	) {
 
 		this.chunkNode = new ChunkNode(this.camera, grid);
 		this.chunkNode.init();
@@ -48,8 +49,6 @@ export class PipelineV1 {
 
 		this.output = new OutputNode(this.denoiser);
 		this.output.init();
-
-		generateStartScene(grid);
 	}
 
 	run() {
