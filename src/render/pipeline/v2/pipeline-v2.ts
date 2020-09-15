@@ -1,7 +1,5 @@
 import {Camera} from "../../camera";
 import {OctreeGrid} from "../../../octree/grid";
-
-import {generateStartScene} from "../../../generator/start-scene";
 import {RTChunkNode} from "./node/rt-chunk-node/rt-chunk-node";
 import {EditNode} from "../shared-node/edit/edit-node";
 import {OutputNode} from "../shared-node/output/output";

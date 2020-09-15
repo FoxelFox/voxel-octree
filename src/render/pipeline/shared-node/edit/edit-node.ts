@@ -1,4 +1,4 @@
-import {ArrayBuffer, Quad, Shader, SimpleNode, Texture} from "@foxel_fox/glib";
+import {ArrayBuffer, Shader, SimpleNode, Texture} from "@foxel_fox/glib";
 import {canvas, gl} from "../../../context";
 import {mat4} from "gl-matrix";
 import {Camera} from "../../../camera";

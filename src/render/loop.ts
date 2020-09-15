@@ -2,7 +2,6 @@ import {PipelineV1} from "./pipeline/v1/pipeline-v1";
 import {canvas, gl, pixelRatio} from "./context";
 import {resizeDrawingBuffer} from "@foxel_fox/glib";
 import GLBench from "gl-bench/dist/gl-bench";
-import { resolve } from "dns";
 import {Camera} from "./camera";
 import {PipelineV2} from "./pipeline/v2/pipeline-v2";
 import {generateStartScene} from "../generator/start-scene";

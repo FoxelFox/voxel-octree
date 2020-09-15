@@ -2,7 +2,6 @@ import {OctreeGrid} from "./octree/grid";
 import "./render/context";
 import {start, init} from "./render/loop";
 import {spawn, Worker} from "threads/dist";
-import {generateStartScene} from "./generator/start-scene";
 
 async function main() {
 
