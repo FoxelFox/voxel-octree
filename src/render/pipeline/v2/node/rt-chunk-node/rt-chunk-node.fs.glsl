@@ -21,6 +21,9 @@ in vec3 rayOrigin;
 #define DIELECTRIC 2.
 
 layout(location = 0) out vec4 f_color;
+layout(location = 1) out vec3 f_normal;
+layout(location = 2) out vec4 f_position;
+layout(location = 3) out vec4 f_albedo;
 
 
 const float EPS = 0.0001;
@@ -152,9 +155,9 @@ float checkerBoard( vec2 p ) {
 }
 
 vec3 getSkyColor( vec3 rd ) {
-//    vec3 col = mix(vec3(1),vec3(.5,.7,1), .5+.5*rd.y);
-//    float sun = clamp(dot(normalize(vec3(-.4,.7,-.6)),rd), 0., 1.);
-//    col += vec3(1,.6,.1)*(pow(sun,4.) + 10.*pow(sun,32.));
+    //    vec3 col = mix(vec3(1),vec3(.5,.7,1), .5+.5*rd.y);
+    //    float sun = clamp(dot(normalize(vec3(-.4,.7,-.6)),rd), 0., 1.);
+    //    col += vec3(1,.6,.1)*(pow(sun,4.) + 10.*pow(sun,32.));
     return vec3(max(dot(rd, vec3(0,0,1)), 0.25));
 }
 
@@ -228,6 +231,11 @@ vec3 render( in vec3 ro, in vec3 rd, inout float seed ) {
                 rd = hash1(seed) <= reflectProb ? reflect(rd,normal) : refracted;
                 rd = modifyDirectionWithRoughness(-normalOut, rd, roughness, seed);
             }
+            if (i == 0) {
+                f_albedo.rgb = col;
+                f_normal.rgb = normal;
+                f_position.rgb = ro;
+            }
         } else {
             col *= getSkyColor(rd);
             return col;
@@ -254,13 +262,13 @@ void main()
     // float seed = float(baseHash(floatBitsToUint(p - iTime)))/float(0xffffffffU);
     float seed = 1.0;
     // AA
-//    p += 2.*hash2(seed)/iResolution.y;
-//    vec3 rd = ca * normalize( vec3(p.xy,1.6) );
+    //    p += 2.*hash2(seed)/iResolution.y;
+    //    vec3 rd = ca * normalize( vec3(p.xy,1.6) );
 
     // DOF
-//    vec3 fp = ro + rd * fpd;
-//    ro = ro + ca * vec3(randomInUnitDisk(seed), 0.)*.02;
-//    rd = normalize(fp - ro);
+    //    vec3 fp = ro + rd * fpd;
+    //    ro = ro + ca * vec3(randomInUnitDisk(seed), 0.)*.02;
+    //    rd = normalize(fp - ro);
 
     vec3 col = render(rayOrigin, rayDirection, seed);
 

@@ -42,11 +42,6 @@ export class RTChunkNode extends SimpleNode {
 		this.colors = new Texture(4096, 1);
 
 		this.frameBuffer = new FrameBuffer([diffuse, normal, position, albedo], true, true);
-		this.grid.getNext().then(n => {
-			if (n) {
-				this.uploadQueue.push(n);
-			}
-		})
 	}
 
 	run() {
@@ -62,11 +57,6 @@ export class RTChunkNode extends SimpleNode {
 
 			this.grid.meshUploaded(chunkID)
 		}
-		this.grid.getNext().then(n => {
-			if (n) {
-				this.uploadQueue.push(n);
-			}
-		})
 	}
 
 	render() {

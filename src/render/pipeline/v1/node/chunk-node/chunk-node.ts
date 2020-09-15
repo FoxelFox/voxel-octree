@@ -43,11 +43,6 @@ export class ChunkNode {
 		this.colors = new Texture(4096, 1);
 
 		this.frameBuffer = new FrameBuffer([output, normal, position], true, true);
-		this.grid.getNext().then(n => {
-			if (n) {
-				this.uploadQueue.push(n);
-			}
-		})
 	}
 
 	run() {
@@ -105,11 +100,6 @@ export class ChunkNode {
 			}
 			this.grid.meshUploaded(chunkID)
 		}
-		this.grid.getNext().then(n => {
-			if (n) {
-				this.uploadQueue.push(n);
-			}
-		})
 	}
 
 	render() {
