@@ -42,20 +42,9 @@ export function init() {
 export function start(grid) {
 
 	const camera = new Camera();
-	let pipeline = new PipelineV2(grid, camera);
-	let pipeline2 = new PipelineV1(grid, camera);
+	let pipeline = new PipelineV1(grid, camera);
+
 	generateStartScene(grid);
-
-	document.addEventListener('keydown', (element) => {
-		switch (element.key) {
-			case "Tab":
-				let tmp = pipeline;
-				pipeline = <any>pipeline2;
-				pipeline2 = <any>tmp;
-				element.preventDefault();
-		}
-	});
-
 	requestAnimationFrame(loop);
 
 	function loop() {
@@ -66,7 +55,6 @@ export function start(grid) {
 		grid.getNext().then(n => {
 			if (n) {
 				pipeline.chunkNode.uploadQueue.push(n);
-				pipeline2.chunkNode.uploadQueue.push(n);
 			}
 		})
 

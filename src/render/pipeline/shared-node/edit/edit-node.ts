@@ -82,7 +82,7 @@ export class EditNode extends SimpleNode {
 				const start = [this.readPixelPosition[0] * 1024 + 1024 * 0.5 - this.size * 0.5, this.readPixelPosition[1] * 1024 + 1024 * 0.5 - this.size * 0.5,this.readPixelPosition[2] * 1024 + 1024 * 0.5 - this.size * 0.5];
 				const end = [start[0] + this.size -1, start[1] + this.size -1, start[2] + this.size -1];
 
-
+				// console.log(start)
 				switch (e.button) {
 					case 0:
 						this.grid.modify([
@@ -117,11 +117,19 @@ export class EditNode extends SimpleNode {
 		gl.readBuffer(gl.COLOR_ATTACHMENT1);
 		gl.readPixels(canvas.width / 2, canvas.height / 2 , 1, 1, gl.RGBA, gl.FLOAT, this.readPixelNormal);
 
+		// Fix for Nvidia's unprecition
+		this.readPixelNormal[0] = Math.round(this.readPixelNormal[0])
+		this.readPixelNormal[1] = Math.round(this.readPixelNormal[1])
+		this.readPixelNormal[2] = Math.round(this.readPixelNormal[2])
+
 		gl.readBuffer(gl.COLOR_ATTACHMENT2);
 		gl.readPixels(canvas.width / 2, canvas.height / 2 , 1, 1, gl.RGBA, gl.FLOAT, this.readPixelPosition);
 
+		this.readPixelPosition[0] = Math.round(this.readPixelPosition[0] * 1024) / 1024
+		this.readPixelPosition[1] = Math.round(this.readPixelPosition[1] * 1024) / 1024
+		this.readPixelPosition[2] = Math.round(this.readPixelPosition[2] * 1024) / 1024
 
-
+		// Fix for Nvidia's unprecition
 		let cx = Math.floor(Math.floor(this.readPixelPosition[0] * 1024) / this.size ) * this.size;
 		let cy = Math.floor(Math.floor(this.readPixelPosition[1] * 1024) / this.size ) * this.size;
 		let cz = Math.floor(Math.floor(this.readPixelPosition[2] * 1024) / this.size ) * this.size;
