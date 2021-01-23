@@ -34,7 +34,7 @@ export function init() {
 		bench = new GLBench(gl);
 
 		setTimeout(() => {
-			resolve();
+			resolve(undefined);
 		}, 16 * 4);
 	});
 }
