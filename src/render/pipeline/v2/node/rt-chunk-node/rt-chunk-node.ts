@@ -19,7 +19,7 @@ export class RTChunkNode extends SimpleNode {
 	uploadQueue = [];
 	frame = 0;
 	oldMVP: mat4;
-	currentMVP: mat4;
+	currentMVP = mat4.create();
 
 	constructor (
 		private camera: Camera,

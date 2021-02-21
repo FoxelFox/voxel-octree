@@ -8,7 +8,7 @@ import {Denoiser} from "../denoiser/denoiser";
 export class OutputNode extends SimpleNode {
 
 	constructor (
-		private rtGINode: Denoiser
+		private output: Denoiser
 	) {
 		super(new Shader(require("./output.vs.glsl"), require("./output.fs.glsl")), new Quad() as {});
 	}
@@ -25,7 +25,7 @@ export class OutputNode extends SimpleNode {
 
 		gl.activeTexture(gl.TEXTURE0);
 		gl.uniform1i(this.shader.getUniformLocation("tFinal"), 0);
-		gl.bindTexture(gl.TEXTURE_2D, this.rtGINode.frameBuffer.textures[0].webGLTexture);
+		gl.bindTexture(gl.TEXTURE_2D, this.output.frameBuffer.textures[0].webGLTexture);
 
 
 		gl.bindVertexArray(this.vao);

@@ -40,6 +40,7 @@ export class PipelineV2 {
 		this.camera.update();
 		this.chunkNode.run();
 		this.edit.run();
+		this.denoiser.run();
 		this.output.run();
 	}
 }
