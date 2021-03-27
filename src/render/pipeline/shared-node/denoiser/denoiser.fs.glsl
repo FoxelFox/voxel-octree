@@ -89,7 +89,7 @@ void main() {
 
     //outColor.x = texture(tPositionL, uvOld).w;
     //outColor.x = p.w;
-    outColor = vec4(1,0,0,1);//texture(tPosition, v_texCoord);
+    //outColor = vec4(1,0,0,1);//texture(tPosition, v_texCoord);
 
 }
 
