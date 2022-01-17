@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack --mode production",
     "build-w": "webpack --mode development -w --devtool source-map",
-    "server": "ws"
+    "server": "ws --stack src/server.js spa static index"
   },
   "repository": {
     "type": "git",
