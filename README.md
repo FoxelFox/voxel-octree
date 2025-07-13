@@ -8,6 +8,6 @@ Controls:
 * select color with 1-9 (0 is light block)
 * place Voxel witch right click
 
-Live Demo: https://64f.de/voxel-octree-rt-v7/
+Live Demo: [https://64f.de/voxel-octree-rt-v7/](https://64f.de/voxel-octree-rt/index.html)
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/1Sfj7V59kPY/0.jpg)](https://www.youtube.com/watch?v=1Sfj7V59kPY)
